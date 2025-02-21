@@ -22,13 +22,10 @@ export default function TopBar() {
 						Prints
 					</div>
 					<div className="text-xl border-2 border-black rounded-xl px-2 py-1">
-						Print
+						Clothing
 					</div>
 					<div className="text-xl border-2 border-black rounded-xl px-2 py-1">
-						Print
-					</div>
-					<div className="text-xl border-2 border-black rounded-xl px-2 py-1">
-						Print
+						Other
 					</div>
 				</div>
 				<div className="flex space-x-4 mr-2">

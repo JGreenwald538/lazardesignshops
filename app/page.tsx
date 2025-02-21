@@ -3,6 +3,8 @@
 import { useEffect, useState, useRef } from "react";
 import ShopItem from "./components/ShopItem";
 import TopBar from "./components/TopBar";
+import Filter from "./components/Filter";
+import SortBy from "./components/SortBy";
 
 interface PrintifyProduct {
 	id: string;
@@ -77,6 +79,10 @@ export default function Home() {
 	return (
 		<div className="w-screen flex flex-col justify-center items-center mx-auto">
 			<TopBar />
+			<div className="flex flex-row border-2 border-black w-3/4 p-2 my-4 rounded-xl justify-around">
+				<Filter />
+				<SortBy />
+			</div>
 			<div className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 w-fit items-center justify-center mb-6 mx-auto gap-x-40">
 				{products.map((product) => (
 					<ShopItem

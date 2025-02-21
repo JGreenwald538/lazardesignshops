@@ -38,29 +38,36 @@ export default function ProductPage() {
 			});
 	}, [id]);
 
+    console.log(product)
+
 	return (
 		<div>
 			{loading && <p>Loading product...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			{product && (
 				<div
-					className="flex justify-center flex-col items-center h-screen"
+					className="flex justify-center md:flex-row flex-col items-center h-screen"
 					key={"asd"}
 				>
-					<div className="text-4xl font-bold">{product.title}</div>
-					{product.description
-						?.split(".:")
-						.map((text: string, index: number) => (
-							<div key={index.toString()} className="w-1/2 text-center">{text}</div>
-						)) || "No description available"}
 					{product.images && product.images.length > 0 && (
 						<Image
 							src={product.images[0].src}
 							alt={product.title}
-							width={300}
+							width={4000}
 							height={4000}
+                            className="object-scale-down w-96"
 						/>
 					)}
+					<div className="flex flex-col justify-center items-center md:w-1/2 w-full px-4 md:px-0">
+						<div className="text-4xl font-bold text-left w-full">{product.title}</div>
+						{product.description
+							?.split(".:")
+							.map((text: string, index: number) => (
+								<div key={index.toString()} className="text-start w-full mt-2">
+									{text}
+								</div>
+							)) || "No description available"}
+					</div>
 				</div>
 			)}
 		</div>

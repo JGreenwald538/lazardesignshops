@@ -12,20 +12,21 @@ export default function ShopItem({
 }) {
 	return (
 		<div className="w-full justify-center flex">
-			<div className="flex flex-col border-2 border-black p-2 hover:opacity-70 w-80 rounded-md mt-6 items-center mx-auto">
-				<Link href={`/product/${productId}`}>
-					<Image
-						src={imagePath}
-						alt=""
-						width={2000}
-						height={2000}
-						className="w-96 object-scale-down"
-						unoptimized
-						loading="lazy"
-					/>
-				</Link>
+			<Link
+				className="flex flex-col border-2 border-black p-2 hover:opacity-70 w-80 rounded-md mt-6 items-center mx-auto"
+				href={`/product/${productId}`}
+			>
+				<Image
+					src={imagePath}
+					alt=""
+					width={2000}
+					height={2000}
+					className="w-96 object-scale-down"
+					unoptimized
+					loading="lazy"
+				/>
 				<div>{displayName}</div>
-			</div>
+			</Link>
 		</div>
 	);
 }
