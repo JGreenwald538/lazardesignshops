@@ -3,9 +3,12 @@ import Link from "next/link";
 
 export default function TopBar() {
 	return (
-		<div className="px-24 pt-8 w-full">
-			<div className="w-full rounded-xl border-2 border-black flex flex-row py-5 items-center">
-				<Link href={"/"} className="object-scale-down w-[12%] justify-start">
+		<div className="md:px-24 px-10 pt-8 w-full">
+			<div className="w-full rounded-xl border-2 border-black flex md:flex-row flex-col py-5 items-center md:gap-y-0 gap-y-5">
+				<Link
+					href={"/"}
+					className="object-scale-down md:w-[12%] w-1/2 justify-start"
+				>
 					<Image
 						src="/Lazar.Wide.white.png"
 						alt=""
@@ -14,7 +17,7 @@ export default function TopBar() {
 						className=""
 					/>
 				</Link>
-				<div className="flex-1 flex justify-around">
+				<div className="flex-1 flex justify-around gap-x-5">
 					<div className="text-xl border-2 border-black rounded-xl px-2 py-1">
 						Prints
 					</div>
