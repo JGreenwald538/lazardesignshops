@@ -1,14 +1,19 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request, { params }: { params: { id: string } }) {
+export async function GET(
+  request: Request,
+  context: { params: { id: string } } // Use `context` to reference params
+) {
   try {
     const API_KEY = process.env.PRINTIFY_API_KEY;
     const STORE_ID = process.env.PRINTIFY_STORE_ID;
-    const { id } = params; // Extract product ID from the URL
-
+    
     if (!API_KEY || !STORE_ID) {
       return NextResponse.json({ error: "Missing API credentials" }, { status: 500 });
     }
+
+    // Ensure params is properly awaited before using
+    const { id } = await context.params; 
 
     if (!id) {
       return NextResponse.json({ error: "Product ID is required" }, { status: 400 });
