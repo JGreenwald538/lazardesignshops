@@ -36,6 +36,9 @@ export const metadata: Metadata = {
 		description: "A short description of this page.",
 		images: ["/LazarDesign.banner.png"], // ✅ Same as OpenGraph image
 	},
+	other: {
+		"theme-color": "#14459e",
+	},
 };
 
 export default function RootLayout({
