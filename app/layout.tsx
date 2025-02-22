@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -36,9 +36,10 @@ export const metadata: Metadata = {
 		description: "A short description of this page.",
 		images: ["/LazarDesign.banner.png"], // ✅ Same as OpenGraph image
 	},
-	other: {
-		"theme-color": "#14459e",
-	},
+};
+
+export const viewport: Viewport = {
+	themeColor: "#14459E",
 };
 
 export default function RootLayout({
