@@ -48,7 +48,7 @@ export default function Filter() {
 					setClicked(!clicked);
 				}}
 			>
-				SortBy
+				Sort By
 			</button>
 		</div>
 	);

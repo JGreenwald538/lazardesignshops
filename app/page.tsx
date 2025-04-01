@@ -7,6 +7,8 @@ import Filter from "./components/Filter";
 import SortBy from "./components/SortBy";
 import TickerComponent from "./components/Ticker";
 import PopularItem from "./components/PopularItem";
+import { useSearchParams } from "next/navigation";
+import { neon } from "@neondatabase/serverless";
 
 interface PrintifyProduct {
 	id: string;
@@ -19,20 +21,24 @@ export default function Home() {
 	const [loading, setLoading] = useState(false);
 	const [nextCursor, setNextCursor] = useState<string | null>(null);
 	const observer = useRef<IntersectionObserver | null>(null);
+	const searchParams = useSearchParams();
+	console.log(searchParams.get("f"));
 
 	// Fetch initial batch of 10 products
 	useEffect(() => {
 		const fetchInitialProducts = async () => {
-			try {
-				const res = await fetch("/api/printify/products?limit=10");
-				const data = await res.json();
-				if (data.error) throw new Error(data.error);
-
-				setProducts(data.data);
-				setNextCursor(data.nextCursor); // Save cursor for pagination
-			} catch (error) {
-				console.error("Error fetching initial products:", error);
-			}
+			const sql = neon(`${process.env.DATABASE_URL}`);
+			const res = await sql`SELECT * FROM tshirts LIMIT 10`;
+			const data = res.rows;
+			if (data.error) throw new Error(data.error);
+			const formattedProducts = data.map((product: any) => ({
+				id: product.id,
+				title: product.productname,
+				images: [
+					{ src: product.imagepath || "/placeholder.jpg" },
+				],
+			}));
+			setProducts(formattedProducts);
 		};
 
 		fetchInitialProducts();
@@ -86,7 +92,7 @@ export default function Home() {
 				<Filter />
 				<SortBy />
 			</div>
-			<div className="flex flex-row border- w-3/4 p-2 my-4 rounded-xl justify-around">
+			<div className="flex flex-row w-3/4 p-2 my-4 rounded-xl md:justify-around justify-center gap-x-4">
 				<PopularItem displayName="Prints" imagePath="/LazarDesign.banner.png" />
 				<PopularItem displayName="Shirts" imagePath="/LazarDesign.banner.png" />
 			</div>
@@ -94,7 +100,7 @@ export default function Home() {
 				{products.map((product) => (
 					<ShopItem
 						key={product.id}
-						displayName={product.title}
+						displayName={product.title.split("|")[0]}
 						productId={product.id}
 						imagePath={product.images?.[0]?.src || "/placeholder.jpg"}
 					/>

@@ -37,7 +37,7 @@ export default function Filter() {
 				</div>
 			)}
 			<button
-				className="border-2 border-black rounded px-2 text-xl"
+				className="border-2 border-black rounded px-2 text-xl bg-white"
 				onClick={() => {
 					setClicked(!clicked);
 				}}

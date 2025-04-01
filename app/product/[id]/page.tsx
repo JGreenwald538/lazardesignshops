@@ -5,6 +5,8 @@ import { useParams } from "next/navigation";
 import Image from "next/image";
 import DropDown from "@/app/components/Dropdown";
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
+import TopBar from "@/app/components/TopBar";
+import { usePathname } from "next/navigation";
 
 interface PrintifyProduct {
 	id: string;
@@ -72,28 +74,25 @@ export default function ProductPage() {
 
 	return (
 		<div>
+			<TopBar />
 			{loading && <p>Loading product...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			{product && (
 				<div
-					className="flex justify-start md:flex-row flex-col items-start h-screen"
+					className="flex justify-start md:flex-row flex-col items-start h-screen mt-4"
 				>
 					{product.images && product.images.length > 0 && (
 						<div className="w-2/5 flex flex-col">
-							<Image
-								src={product.images[0].src}
-								alt={product.title}
-								width={4000}
-								height={4000}
-								className="object-scale-down"
-							/>
-							<Image
-								src={product.images[0].src}
-								alt={product.title}
-								width={4000}
-								height={4000}
-								className="object-scale-down"
-							/>
+							{product.images.map((image, index) => (
+								<Image
+									key={index}
+									src={image.src}
+									alt={product.title}
+									width={4000}
+									height={4000}
+									className="object-scale-down"
+								/>
+							))}
 						</div>
 					)}
 
