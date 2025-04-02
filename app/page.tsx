@@ -1,13 +1,13 @@
 "use client";
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState, useRef, useCallback } from "react";
 import ShopItem from "./components/ShopItem";
 import TopBar from "./components/TopBar";
 import Filter from "./components/Filter";
 import SortBy from "./components/SortBy";
 import TickerComponent from "./components/Ticker";
 import PopularItem from "./components/PopularItem";
-import { useSearchParams } from "next/navigation";
+// import { useSearchParams } from "next/navigation";
 // import { neon } from "@neondatabase/serverless";
 
 interface PrintifyProduct {
@@ -21,8 +21,7 @@ export default function Home() {
 	const [loading, setLoading] = useState(false);
 	const [nextCursor, setNextCursor] = useState<string | null>(null);
 	const observer = useRef<IntersectionObserver | null>(null);
-	const searchParams = useSearchParams();
-	console.log(searchParams.get("f"));
+	// const searchParams = useSearchParams();
 
 	// Fetch initial batch of 10 products
 	useEffect(() => {
@@ -55,7 +54,7 @@ export default function Home() {
 	}, []);
 
 	// Fetch additional products in batches of 50
-	const fetchMoreProducts = async () => {
+	const fetchMoreProducts = useCallback(async () => {
 		if (loading || !nextCursor) return;
 		setLoading(true);
 
@@ -73,7 +72,7 @@ export default function Home() {
 		} finally {
 			setLoading(false);
 		}
-	};
+	}, [loading, nextCursor]);
 
 	// Set up Intersection Observer to trigger load more
 	useEffect(() => {
