@@ -6,7 +6,6 @@ import Image from "next/image";
 import DropDown from "@/app/components/Dropdown";
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import TopBar from "@/app/components/TopBar";
-import { usePathname } from "next/navigation";
 
 interface PrintifyProduct {
 	id: string;

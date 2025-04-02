@@ -8,7 +8,7 @@ import SortBy from "./components/SortBy";
 import TickerComponent from "./components/Ticker";
 import PopularItem from "./components/PopularItem";
 import { useSearchParams } from "next/navigation";
-import { neon } from "@neondatabase/serverless";
+// import { neon } from "@neondatabase/serverless";
 
 interface PrintifyProduct {
 	id: string;
@@ -27,18 +27,28 @@ export default function Home() {
 	// Fetch initial batch of 10 products
 	useEffect(() => {
 		const fetchInitialProducts = async () => {
-			const sql = neon(`${process.env.DATABASE_URL}`);
-			const res = await sql`SELECT * FROM tshirts LIMIT 10`;
-			const data = res.rows;
-			if (data.error) throw new Error(data.error);
-			const formattedProducts = data.map((product: any) => ({
-				id: product.id,
-				title: product.productname,
-				images: [
-					{ src: product.imagepath || "/placeholder.jpg" },
-				],
-			}));
-			setProducts(formattedProducts);
+			try {
+				const res = await fetch("/api/printify/products?limit=10");
+				const data = await res.json();
+				if (data.error) throw new Error(data.error);
+
+				setProducts(data.data);
+				setNextCursor(data.nextCursor); // Save cursor for pagination
+			} catch (error) {
+				console.error("Error fetching initial products:", error);
+			}
+			// const sql = neon(`${process.env.DATABASE_URL}`);
+			// const res = await sql`SELECT * FROM tshirts LIMIT 10`;
+			// const data = res.rows;
+			// if (data.error) throw new Error(data.error);
+			// const formattedProducts = data.map((product: any) => ({
+			// 	id: product.id,
+			// 	title: product.productname,
+			// 	images: [
+			// 		{ src: product.imagepath || "/placeholder.jpg" },
+			// 	],
+			// }));
+			// setProducts(formattedProducts);
 		};
 
 		fetchInitialProducts();
