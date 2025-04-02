@@ -18,25 +18,25 @@ export default function TopBar() {
 					/>
 				</Link>
 				<div className="flex-1 flex justify-around gap-x-5">
-					<button className="text-xl border-2 border-[#251887] bg-[#251887] text-white rounded-xl px-2 py-1">
+					<button className="text-xl border-2 border-[#3b2abf] bg-[#3b2abf] text-white rounded-xl px-2 py-1">
 						Prints
 					</button>
-					<button className="text-xl border-2 border-[#251887] bg-[#251887] text-white rounded-xl px-2 py-1">
+					<button className="text-xl border-2 border-[#3b2abf] bg-[#3b2abf] text-white rounded-xl px-2 py-1">
 						Clothing
 					</button>
-					<button className="text-xl border-2 border-[#251887] bg-[#251887] text-white rounded-xl px-2 py-1">
+					<button className="text-xl border-2 border-[#3b2abf] bg-[#3b2abf] text-white rounded-xl px-2 py-1">
 						Other
 					</button>
 				</div>
 				<div className="flex space-x-4 mr-2">
 					<Link
-						className="text-xl border-2 border-[#251887] bg-[#251887] text-white rounded-xl px-2 py-1"
+						className="text-xl border-2 border-[#3b2abf] bg-[#3b2abf] text-white rounded-xl px-2 py-1"
 						href={"/contact"}
 					>
 						Contact
 					</Link>
 					<Link
-						className="text-xl border-2 border-[#251887] bg-[#251887] text-white rounded-xl px-2 py-1"
+						className="text-xl border-2 border-[#3b2abf] bg-[#3b2abf] text-white rounded-xl px-2 py-1"
 						href={"/customorder"}
 					>
 						Custom Order
