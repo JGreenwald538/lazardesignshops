@@ -1,15 +1,12 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState } from "react";
 import ShopItem from "./components/ShopItem";
 import TopBar from "./components/TopBar";
 import Filter from "./components/Filter";
 import SortBy from "./components/SortBy";
 import TickerComponent from "./components/Ticker";
 import PopularItem from "./components/PopularItem";
-// import { useSearchParams } from "next/navigation";
-// import { neon } from "@neondatabase/serverless";
-
 interface PrintifyProduct {
 	id: string;
 	title: string;
@@ -18,80 +15,24 @@ interface PrintifyProduct {
 
 export default function Home() {
 	const [products, setProducts] = useState<PrintifyProduct[]>([]);
-	const [loading, setLoading] = useState(false);
-	const [nextCursor, setNextCursor] = useState<string | null>(null);
-	const observer = useRef<IntersectionObserver | null>(null);
-	// const searchParams = useSearchParams();
 
-	// Fetch initial batch of 10 products
 	useEffect(() => {
 		const fetchInitialProducts = async () => {
 			try {
-				const res = await fetch("/api/printify/products?limit=10");
+				const res = await fetch("/api/printify/tshirts");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
 
 				setProducts(data.data);
-				setNextCursor(data.nextCursor); // Save cursor for pagination
 			} catch (error) {
 				console.error("Error fetching initial products:", error);
 			}
-			// const sql = neon(`${process.env.DATABASE_URL}`);
-			// const res = await sql`SELECT * FROM tshirts LIMIT 10`;
-			// const data = res.rows;
-			// if (data.error) throw new Error(data.error);
-			// const formattedProducts = data.map((product: any) => ({
-			// 	id: product.id,
-			// 	title: product.productname,
-			// 	images: [
-			// 		{ src: product.imagepath || "/placeholder.jpg" },
-			// 	],
-			// }));
-			// setProducts(formattedProducts);
 		};
 
 		fetchInitialProducts();
 	}, []);
 
-	// Fetch additional products in batches of 50
-	const fetchMoreProducts = useCallback(async () => {
-		if (loading || !nextCursor) return;
-		setLoading(true);
 
-		try {
-			const res = await fetch(
-				`/api/printify/products?limit=50&after=${nextCursor}`
-			);
-			const data = await res.json();
-			if (data.error) throw new Error(data.error);
-
-			setProducts((prev) => [...prev, ...data.data]);
-			setNextCursor(data.nextCursor); // Update cursor for next batch
-		} catch (error) {
-			console.error("Error fetching more products:", error);
-		} finally {
-			setLoading(false);
-		}
-	}, [loading, nextCursor]);
-
-	// Set up Intersection Observer to trigger load more
-	useEffect(() => {
-		if (observer.current) observer.current.disconnect();
-
-		observer.current = new IntersectionObserver(
-			(entries) => {
-				if (entries[0].isIntersecting) {
-					fetchMoreProducts();
-				}
-			},
-			{ threshold: 1 }
-		);
-
-		const target = document.getElementById("load-more-trigger");
-		if (target) observer.current.observe(target);
-
-		return () => observer.current?.disconnect();
-	}, [nextCursor, fetchMoreProducts]);
 
 	return (
 		<div className="w-screen flex flex-col justify-center items-center mx-auto">
@@ -115,11 +56,6 @@ export default function Home() {
 					/>
 				))}
 			</div>
-			<div id="load-more-trigger" className="h-10 w-full"></div>
-			{loading && <p className="mt-4">Loading more products...</p>}
-			{!nextCursor && (
-				<p className="mt-4 text-gray-500">No more products to load.</p>
-			)}
 		</div>
 	);
 }
