@@ -7,7 +7,7 @@ const messages = [
 
 const TickerComponent = () => {
 	return (
-		<div className="flex justify-center w-full overflow-hidden text-black py-2 bg-[#e35050] mt-4">
+		<div className="flex justify-center w-full overflow-hidden text-white py-2 bg-[#206DCC] mt-4">
 			<div className="max-w-full w-full">
 				<Marquee speed={50} gradient={false} loop={0} autoFill>
 					{messages.map((msg, index) => (

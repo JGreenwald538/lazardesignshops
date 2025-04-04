@@ -11,9 +11,9 @@ export default function ShopItem({
 	imagePath: string;
 }) {
 	return (
-		<div className="w-full justify-center flex">
+		<div className="w-full justify-center flex group">
 			<Link
-				className="flex flex-col border-2 border-black p-2 hover:opacity-70 w-80 rounded-md mt-6 items-center mx-auto"
+				className="flex flex-col p-2 w-80 rounded-md mt-6 items-center mx-auto"
 				href={`/product/${productId}`}
 			>
 				<Image
@@ -21,11 +21,13 @@ export default function ShopItem({
 					alt=""
 					width={2000}
 					height={2000}
-					className="w-96 object-scale-down"
+					className="w-96 object-scale-down group-hover:scale-105 transition-all duration-500"
 					unoptimized
 					loading="lazy"
 				/>
-				<div>{displayName}</div>
+				<div className="border-2 border-[#383531] rounded w-full text-center mt-2 hover group-hover:bg-[#383531] group-hover:text-white transition-all duration-500">
+					{displayName}
+				</div>
 			</Link>
 		</div>
 	);

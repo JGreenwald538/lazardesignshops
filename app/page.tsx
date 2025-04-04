@@ -18,15 +18,27 @@ export default function Home() {
 
 	useEffect(() => {
 		const fetchInitialProducts = async () => {
+			let posters: PrintifyProduct[] = [];
+			let shirts: PrintifyProduct[] = [];
 			try {
 				const res = await fetch("/api/printify/tshirts");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
-
-				setProducts(data.data);
+				shirts = data.data;
 			} catch (error) {
 				console.error("Error fetching initial products:", error);
 			}
+			try {
+				const res = await fetch("/api/printify/posters");
+				const data = await res.json();
+				if (data.error) throw new Error(data.error);
+				posters = data.data;
+			} catch (error) {
+				console.error("Error fetching initial products:", error);
+			}
+			const allProducts = [...posters, ...shirts].sort(() => Math.random() - 0.5);
+
+			setProducts(allProducts);
 		};
 
 		fetchInitialProducts();
@@ -38,11 +50,11 @@ export default function Home() {
 		<div className="w-screen flex flex-col justify-center items-center mx-auto">
 			<TopBar />
 			<TickerComponent />
-			<div className="flex flex-row border-black w-3/4 p-2 my-4 rounded-xl justify-between">
+			<div className="flex flex-row border-black w-3/4 p-2 md:my-4 my-0 rounded-xl justify-between">
 				<Filter />
 				<SortBy />
 			</div>
-			<div className="flex flex-row w-3/4 p-2 my-4 rounded-xl md:justify-around justify-center gap-x-4">
+			<div className="flex flex-row p-2 md:my-4 my-0 rounded-xl md:justify-around justify-center gap-x-20">
 				<PopularItem displayName="Prints" imagePath="/LazarDesign.banner.png" />
 				<PopularItem displayName="Shirts" imagePath="/LazarDesign.banner.png" />
 			</div>

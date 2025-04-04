@@ -16,9 +16,9 @@ export async function GET() {
 		}
 
 		const newApiUrl = `https://api.printify.com/v1/shops/${STORE_ID}/products/`;
-		const sqlQuery = await sql`SELECT * FROM tshirts`;
+		const sqlQuery = await sql`SELECT * FROM posters`;
 
-		const tshirts = await Promise.all(
+		const posters = await Promise.all(
             sqlQuery.map(async (row) => {
                 const response = await fetch(newApiUrl + row.id.trim() + ".json", {
                     headers: {
@@ -31,17 +31,17 @@ export async function GET() {
                         `Printify API error for ID ${row.id}: ${response.statusText}`
                     );
                 }
-                return response.json();
+                return response.json()
             })
         );
 
-		for (let i = 0; i < tshirts.length; i++) {
-			tshirts[i].title = sqlQuery[i].productname;
+		for (let i = 0; i < posters.length; i++) {
+			posters[i].title = sqlQuery[i].productname;
 		}
 
 		return NextResponse.json(
 			{
-				data: tshirts,
+				data: posters,
 			},
 			{ status: 200 }
 		);
