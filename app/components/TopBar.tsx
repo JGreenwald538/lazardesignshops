@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { FaShoppingCart } from "react-icons/fa";
 
 export default function TopBar() {
 	return (
@@ -42,6 +43,7 @@ export default function TopBar() {
 					>
 						Custom Order
 					</Link>
+					<FaShoppingCart className="text-4xl text-black py-1" />
 				</div>
 			</div>
 		</div>
