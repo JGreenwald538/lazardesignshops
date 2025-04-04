@@ -15,6 +15,7 @@ import "./globals.css";
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
 	subsets: ["latin"],
+	weight: ["500"],
 });
 
 // ✅ Use Next.js Metadata API for Open Graph tags

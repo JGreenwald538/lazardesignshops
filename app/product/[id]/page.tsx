@@ -77,20 +77,32 @@ export default function ProductPage() {
 			{loading && <p>Loading product...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			{product && (
-				<div
-					className="flex justify-start md:flex-row flex-col items-start h-screen mt-4"
-				>
+				<div className="flex justify-start md:flex-row flex-col items-start h-screen mt-4">
 					{product.images && product.images.length > 0 && (
 						<div className="w-2/5 flex flex-col">
 							{product.images.map((image, index) => (
-								<Image
-									key={index}
-									src={image.src}
-									alt={product.title}
-									width={4000}
-									height={4000}
-									className="object-scale-down"
-								/>
+								<div className="group">
+									<Image
+										key={index}
+										src={image.src}
+										alt={product.title}
+										width={4000}
+										height={4000}
+										className={`object-scale-down ${
+											index === 0 ? "" : "hidden"
+										}`}
+									/>
+									<Image
+										key={index}
+										src={image.src}
+										alt={product.title}
+										width={4000}
+										height={4000}
+										className={`object-scale-down absolute bottom-40 w-20 group-hover:block ${
+											index === 0 ? "hidden" : ""
+										}`}
+									/>
+								</div>
 							))}
 						</div>
 					)}
@@ -149,9 +161,7 @@ export default function ProductPage() {
 								</button>
 							</div>
 						</div>
-						<div className="text-xl">
-							Estimated Shipping Time: 3-5 days
-						</div>
+						<div className="text-xl">Estimated Shipping Time: 3-5 days</div>
 						<div className="flex flex-row gap-x-4">
 							<button className="bg-black text-white px-4 py-2 rounded-md">
 								Add to Cart
