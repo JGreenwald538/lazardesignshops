@@ -39,6 +39,7 @@ interface PrintifyProduct {
 	blueprint_id?: string;
 	created_by?: string;
 	updated_by?: string;
+	prices?: { size: number }[];
 }
 
 export default function ProductPage() {
@@ -76,7 +77,7 @@ export default function ProductPage() {
 			{loading && <p>Loading product...</p>}
 			{error && <p style={{ color: "red" }}>{error}</p>}
 			{product && (
-				<div className="flex justify-start md:flex-row flex-col items-start h-screen mt-4">
+				<div className="flex justify-start md:flex-row flex-col items-center h-full mt-4">
 					{product.images && product.images.length > 0 && (
 						<div className="w-2/5 flex flex-col items-center gap-4">
 							{/* Main Image Display */}
@@ -95,7 +96,7 @@ export default function ProductPage() {
 								{product.images.map((image, index) => (
 									<div
 										key={index}
-										className={`cursor-pointer relative border-2 hover:border-blue-500 transition-all ${
+										className={`cursor-pointer relative transition-all ${
 											selectedImageIndex === index
 												? "border-black"
 												: "border-gray-200"
