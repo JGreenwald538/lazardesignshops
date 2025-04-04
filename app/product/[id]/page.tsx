@@ -47,6 +47,7 @@ export default function ProductPage() {
 	const [loading, setLoading] = useState<boolean>(true);
 	const [error, setError] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(1);
+	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
 
 	useEffect(() => {
 		if (!id) return;
@@ -69,8 +70,6 @@ export default function ProductPage() {
 			});
 	}, [id]);
 
-	console.log(product);
-
 	return (
 		<div>
 			<TopBar />
@@ -79,31 +78,41 @@ export default function ProductPage() {
 			{product && (
 				<div className="flex justify-start md:flex-row flex-col items-start h-screen mt-4">
 					{product.images && product.images.length > 0 && (
-						<div className="w-2/5 flex flex-col">
-							{product.images.map((image, index) => (
-								<div className="group">
-									<Image
+						<div className="w-2/5 flex flex-col items-center gap-4">
+							{/* Main Image Display */}
+							<div className="w-full relative">
+								<Image
+									src={product.images[selectedImageIndex].src}
+									alt={`${product.title} - view ${selectedImageIndex + 1}`}
+									width={4000}
+									height={4000}
+									className="object-contain w-full h-auto"
+								/>
+							</div>
+
+							{/* Thumbnail Gallery */}
+							<div className="flex flex-row flex-wrap gap-2 justify-center">
+								{product.images.map((image, index) => (
+									<div
 										key={index}
-										src={image.src}
-										alt={product.title}
-										width={4000}
-										height={4000}
-										className={`object-scale-down ${
-											index === 0 ? "" : "hidden"
+										className={`cursor-pointer relative border-2 hover:border-blue-500 transition-all ${
+											selectedImageIndex === index
+												? "border-black"
+												: "border-gray-200"
 										}`}
-									/>
-									<Image
-										key={index}
-										src={image.src}
-										alt={product.title}
-										width={4000}
-										height={4000}
-										className={`object-scale-down absolute bottom-40 w-20 group-hover:block ${
-											index === 0 ? "hidden" : ""
-										}`}
-									/>
-								</div>
-							))}
+										onMouseEnter={() => setSelectedImageIndex(index)}
+										onClick={() => setSelectedImageIndex(index)}
+									>
+										<Image
+											src={image.src}
+											alt={`${product.title} thumbnail ${index + 1}`}
+											width={80}
+											height={80}
+											className="object-cover w-16 h-16"
+										/>
+									</div>
+								))}
+							</div>
 						</div>
 					)}
 
