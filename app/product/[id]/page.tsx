@@ -53,7 +53,7 @@ export default function ProductPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(1);
 	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
-	const [type, setType] = useState<string>("");
+	// const [type, setType] = useState<string>("");
 	console.log(product);
 
 	useEffect(() => {
