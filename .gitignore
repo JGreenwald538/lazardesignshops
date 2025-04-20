@@ -42,3 +42,6 @@ next-env.d.ts
 
 # Data
 *.csv
+
+# Everything
+/Everything

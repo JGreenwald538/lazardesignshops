@@ -1,52 +1,57 @@
 import { neon } from "@neondatabase/serverless";
-import { NextResponse } from "next/server";
+import { NextRequest, NextResponse } from "next/server";
 
-export async function GET() {
+export async function GET(
+	request: NextRequest,
+) {
 	try {
-		const API_KEY = process.env.PRINTIFY_API_KEY;
-		const STORE_ID = process.env.PRINTIFY_STORE_ID;
+		const DATABASE_URL = process.env.DATABASE_URL;
 
-		const sql = neon(`${process.env.DATABASE_URL}`);
-
-		if (!API_KEY || !STORE_ID) {
+		if (!DATABASE_URL) {
 			return NextResponse.json(
-				{ error: "Missing API credentials" },
+				{ error: "Missing database URL" },
 				{ status: 500 }
 			);
 		}
 
-		const newApiUrl = `https://api.printify.com/v1/shops/${STORE_ID}/products/`;
-		const sqlQuery = await sql`SELECT * FROM posters`;
+		const sql = neon(DATABASE_URL);
 
-		const posters = await Promise.all(
-            sqlQuery.map(async (row) => {
-                const response = await fetch(newApiUrl + row.id.trim() + ".json", {
-                    headers: {
-                        Authorization: `Bearer ${API_KEY}`,
-                        "Content-Type": "application/json",
-                    },
-                });
-                if (!response.ok) {
-                    throw new Error(
-                        `Printify API error for ID ${row.id}: ${response.statusText}`
-                    );
-                }
-                return response.json()
-            })
-        );
+		const posterResult = await sql`SELECT * FROM posters`;
 
-		for (let i = 0; i < posters.length; i++) {
-			posters[i].title = sqlQuery[i].productname;
+		if (!posterResult || posterResult.length === 0) {
+			return NextResponse.json(
+				{ error: "No t-shirt products found" },
+				{ status: 404 }
+			);
 		}
 
-		return NextResponse.json(
-			{
-				data: posters,
-			},
-			{ status: 200 }
-		);
+		const posterResults = []
+
+		for (const poster of posterResult) {
+			// It's a t-shirt product
+			const posterData = poster;
+			const productData = {
+				id: posterData.id,
+				title: posterData.productname,
+				description: posterData.description || "",
+				images: posterData.images,
+				product_type: "poster",
+				prices:
+				[{size: "11x14", price: posterData.price11by14},
+				{size: "12x16", price: posterData.price12by16},
+				{size: "16x20", price: posterData.price16by20},
+				{size: "20x24", price: posterData.price20by24},
+				{size: "18x24", price: posterData.price18by24},
+				{size: "24x32", price: posterData.price24by32}],
+			};
+
+			posterResults.push(productData);
+		}
+
+		return NextResponse.json(posterResults, { status: 200 });
+
 	} catch (error) {
-		console.error("Error fetching Printify products:", error);
+		console.error("Error fetching product:", error);
 		return NextResponse.json(
 			{ error: (error as Error).message },
 			{ status: 500 }

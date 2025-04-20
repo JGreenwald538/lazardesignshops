@@ -11,7 +11,7 @@ interface PrintifyProduct {
 	id: string;
 	title: string;
 	description?: string;
-	images?: { src: string }[];
+	images?: string[];
 	tags?: string[];
 	variants?: {
 		id: string;
@@ -39,7 +39,11 @@ interface PrintifyProduct {
 	blueprint_id?: string;
 	created_by?: string;
 	updated_by?: string;
-	prices?: { size: number }[];
+	prices?: {
+		size: string;
+		price: string;
+	}[];
+	product_type?: string;
 }
 
 export default function ProductPage() {
@@ -49,6 +53,8 @@ export default function ProductPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(1);
 	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+	const [type, setType] = useState<string>("");
+	console.log(product);
 
 	useEffect(() => {
 		if (!id) return;
@@ -72,19 +78,19 @@ export default function ProductPage() {
 	}, [id]);
 
 	return (
-		<div className="flex flex-col min-h-screen">
+		<div className="flex flex-col min-h-screen overflow-x-hidden">
 			<TopBar />
-			<div className="flex-grow justify-content-center items-center flex">
+			<div className="flex-grow flex items-center justify-center w-full">
 				{loading && <p>Loading product...</p>}
 				{error && <p style={{ color: "red" }}>{error}</p>}
 				{product && (
-					<div className="flex md:flex-row flex-col items-center justify-center mt-4 h-full flex-grow">
+					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full max-w-7xl">
 						{product.images && product.images.length > 0 && (
-							<div className="w-2/5 flex flex-col items-center gap-4 ">
+							<div className="md:w-2/5 w-full max-w-md flex flex-col items-center gap-4 md:mb-0 mb-8">
 								{/* Main Image Display */}
 								<div className="w-full relative">
 									<Image
-										src={product.images[selectedImageIndex].src}
+										src={product.images[selectedImageIndex]}
 										alt={`${product.title} - view ${selectedImageIndex + 1}`}
 										width={4000}
 										height={4000}
@@ -102,11 +108,10 @@ export default function ProductPage() {
 													? "border-black"
 													: "border-gray-200"
 											}`}
-											onMouseEnter={() => setSelectedImageIndex(index)}
 											onClick={() => setSelectedImageIndex(index)}
 										>
 											<Image
-												src={image.src}
+												src={image}
 												alt={`${product.title} thumbnail ${index + 1}`}
 												width={80}
 												height={80}
@@ -118,28 +123,36 @@ export default function ProductPage() {
 							</div>
 						)}
 
-						<div className="flex flex-col justify-center items-left md:w-1/2 w-full px-4 md:px-0 ml-12 gap-y-8">
-							<div className="text-4xl font-bold text-left w-full">
+						<div className="flex flex-col justify-center md:w-1/2 w-full md:pl-8 max-w-xl gap-y-6 md:px-0 px-4">
+							<h1 className="text-3xl md:text-4xl font-bold text-left w-full break-words">
 								{product.title}
-							</div>
-							{product.description
-								?.split(".:")
-								.map((text: string, index: number) => (
-									<div key={index.toString()} className="text-start w-full">
-										{text}
-									</div>
-								)) || "No description available"}
-							{product.variants && (
+							</h1>
+							{product.description ? (
+								<div className="w-full">
+									{product.description
+										.split(".:")
+										.map((text: string, index: number) => (
+											<p
+												key={index.toString()}
+												className="text-start w-full break-words mb-2"
+											>
+												{text.trim()}
+											</p>
+										))}
+								</div>
+							) : (
+								<p className="text-start w-full">No description available</p>
+							)}
+							{product.prices && (
 								<DropDown
-									displayList={product.variants.map((variant) => variant.title)}
+									displayList={product.prices.filter((price) => price.price).map((price) => (price.size))}
 									displayName="Types"
 								/>
 							)}
 							<div className="flex flex-row gap-x-2 items-center">
 								<div className="text-xl">Quantity: </div>
 								<textarea
-									// type="number"
-									className="border-2 border-black rounded-md p-1 w-fit text-center overflow-hidden resize-none px-2"
+									className="border-2 border-black rounded-md p-1 w-10 text-center overflow-hidden resize-none"
 									value={quantity}
 									onChange={(e) => {
 										const val = e.target.value;
