@@ -11,7 +11,7 @@ export default function ShopItem({
 	imagePath: string;
 }) {
 	return (
-		<div className="w-full justify-center flex group">
+		<div className="w-fit justify-center justify-self-center flex group">
 			<Link
 				className="flex flex-col p-2 w-80 rounded-md mt-6 items-center mx-auto"
 				href={`/product/${productId}`}
