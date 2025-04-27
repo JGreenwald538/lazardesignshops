@@ -17,7 +17,7 @@ export async function POST(req: NextRequest) {
 
     try {
         await sql`
-            UPDATE posters 
+            UPDATE tshirts 
             SET 
                 description = ${description || ''},
                 images = ${images}
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
         `;
 
         console.log(`Updated record with ID: ${id}`);
-        return NextResponse.json({ message: "Poster updated successfully" }, { status: 200 });
+        return NextResponse.json({ message: "Tshirt updated successfully" }, { status: 200 });
 
     } catch (error) {
         console.error("Database update failed:", error);

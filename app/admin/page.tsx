@@ -3,34 +3,7 @@
 import { useEffect, useState } from "react";
 import PrintifyProduct from "../utils/PrintifyProduct";
 
-import { neon } from "@neondatabase/serverless";
 import { checkPassword } from "../utils/CheckPassword";
-
-interface DataRowPoster {
-	ID: string;
-	"Product Name": string;
-	'11"x14" Price': number | string;
-	'12"x16" Price': number | string;
-	'16"x20" Price': number | string;
-	'20"x24" Price': number | string;
-	'18"x24" Price': number | string;
-	'24"x32" Price': number | string;
-	description?: string;
-	images?: string[];
-}
-
-interface DataRowTshirt {
-	ID: string;
-	"Product Name": string;
-	'11"x14" Price': number | string;
-	'12"x16" Price': number | string;
-	'16"x20" Price': number | string;
-	'20"x24" Price': number | string;
-	'18"x24" Price': number | string;
-	'24"x32" Price': number | string;
-	description?: string;
-	images?: string[];
-}
 
 export default function AdminPage() {
 	const [tshirts, setTshirts] = useState<PrintifyProduct[]>([]);
@@ -83,6 +56,19 @@ export default function AdminPage() {
 										}),
 									});
 								}
+								for (const tshirt of tshirts) {
+									await fetch("/api/printify/update-tshirt", {
+										method: "POST",
+										headers: {
+											"Content-Type": "application/json",
+										},
+										body: JSON.stringify({
+											id: tshirt.id,
+											description: tshirt.description,
+											images: tshirt.images,
+										}),
+									});
+								}
 							}}
 						>
 							Sync With Printify
@@ -109,45 +95,6 @@ export default function AdminPage() {
 			))}
 		</div>
 	);
-}
-
-async function updatePoster(row: DataRowPoster) {
-	// Connect to the Neon database
-	console.log(process.env.DATABASE_URL);
-	const sql = neon(`${process.env.DATABASE_URL}`);
-
-	// Update the poster record in the Postgres database
-	try {
-		await sql`
-      UPDATE posters 
-      SET 
-        description = ${row.description || ""},
-        images = ${row.images || []}
-      WHERE id = ${row.ID}
-    `;
-		console.log(`Updated record with ID: ${row.ID}`);
-	} catch (error) {
-		console.error(`Error updating record with ID ${row.ID}:`, error);
-	}
-}
-
-async function updateTshirt(row: DataRowTshirt) {
-	// Connect to the Neon database
-	const sql = neon(`${process.env.DATABASE_URL}`);
-
-	// Update the poster record in the Postgres database
-	try {
-		await sql`
-      UPDATE tshirts 
-      SET 
-        description = ${row.description || ""},
-        images = ${row.images || []}
-      WHERE id = ${row.ID}
-    `;
-		console.log(`Updated record with ID: ${row.ID}`);
-	} catch (error) {
-		console.error(`Error updating record with ID ${row.ID}:`, error);
-	}
 }
 
 const fetchInitialProducts = async (
