@@ -26,8 +26,10 @@ export default function AdminPage() {
 				}
 			})
 			.catch((error) => {
-				console.error("Error checking password:", error);
-				alert("An error occurred while checking the password.");
+				if (!first) {
+					console.error("Error checking password:", error);
+					alert("An error occurred while checking the password.");
+				}
 			});
 	};
 
@@ -36,7 +38,7 @@ export default function AdminPage() {
 	});
 
 	const addTshirtCSV = async () => {
-		const allGood: {id: string, name: string}[] = [];
+		const allGood: { id: string; name: string }[] = [];
 		for (const tshirt in tshirtsCSV) {
 			const response = await fetch("/api/printify/add-tshirt", {
 				method: "POST",
@@ -44,7 +46,7 @@ export default function AdminPage() {
 					"Content-Type": "application/json",
 				},
 				body: JSON.stringify({
-					tshirt: tshirtsCSV[tshirt]
+					tshirt: tshirtsCSV[tshirt],
 				}),
 			});
 			if (!response.ok) {
@@ -54,12 +56,17 @@ export default function AdminPage() {
 				});
 			}
 		}
-		if(allGood) {
-			alert("There was an issue with:\n" + allGood.map((product) => {
-				return product.id + ": " + product.name
-			}).join("\n"))
+		if (allGood) {
+			alert(
+				"There was an issue with:\n" +
+					allGood
+						.map((product) => {
+							return product.id + ": " + product.name;
+						})
+						.join("\n")
+			);
 		} else {
-			alert("Upload was successful")
+			alert("Upload was successful");
 		}
 	};
 
@@ -117,12 +124,24 @@ export default function AdminPage() {
 										const row: DataRowTshirt = {
 											ID: tableSplit[i][0],
 											"Product Name": tableSplit[i][1],
-											"Small Price": parseFloat(tableSplit[i][2].replace(/[$]/g, "")),
-											"Medium Price": parseFloat(tableSplit[i][3].replace(/[$]/g, "")),
-											"Large Price": parseFloat(tableSplit[i][4].replace(/[$]/g, "")),
-											"XL Price": parseFloat(tableSplit[i][5].replace(/[$]/g, "")),
-											"2XL Price": parseFloat(tableSplit[i][6].replace(/[$]/g, "")),
-											"3XL Price": parseFloat(tableSplit[i][7].replace(/[$]/g, "")),
+											"Small Price": parseFloat(
+												tableSplit[i][2].replace(/[$]/g, "")
+											),
+											"Medium Price": parseFloat(
+												tableSplit[i][3].replace(/[$]/g, "")
+											),
+											"Large Price": parseFloat(
+												tableSplit[i][4].replace(/[$]/g, "")
+											),
+											"XL Price": parseFloat(
+												tableSplit[i][5].replace(/[$]/g, "")
+											),
+											"2XL Price": parseFloat(
+												tableSplit[i][6].replace(/[$]/g, "")
+											),
+											"3XL Price": parseFloat(
+												tableSplit[i][7].replace(/[$]/g, "")
+											),
 										};
 										rows.push(row);
 									}
