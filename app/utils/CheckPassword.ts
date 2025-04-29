@@ -7,7 +7,6 @@ export async function checkPassword(password: string) {
 	const cookieStore = await cookies();
 	const passwordCookie = cookieStore.get("password")?.value || "";
 	try {
-		console.log(passwordCookie)
 		const result =
 			(await bcryptjs.compare(
 				password,
