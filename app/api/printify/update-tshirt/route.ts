@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
     } catch (error) {
         console.error("Database update failed:", error);
         return NextResponse.json(
-            { error: "Failed to update poster" },
+            { error: "Failed to update tshirt" },
             { status: 500 }
         );
     }
