@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import PrintifyProduct from "../utils/PrintifyProduct";
 
 import { checkPassword } from "../utils/CheckPassword";
-// import { DataRowPoster } from "../utils/DataRowPoster";
 import { DataRowTshirt } from "../utils/DataRowTshirt";
+import { DataRowPoster } from "../utils/DataRowPoster";
 
 export default function AdminPage() {
 	const [tshirts, setTshirts] = useState<PrintifyProduct[]>([]);
@@ -16,6 +16,7 @@ export default function AdminPage() {
 		fetchInitial(setTshirts, setPosters);
 	}, []);
 	const [tshirtsCSV, setTshirtsCSV] = useState<DataRowTshirt[]>([]);
+	const [postersCSV, setPostersCSV] = useState<DataRowPoster[]>([]);
 
 	const handlePasswordSubmit = (first: boolean) => {
 		checkPassword(password)
@@ -57,6 +58,39 @@ export default function AdminPage() {
 			}
 		}
 		if (allGood) {
+			alert(
+				"There was an issue with:\n" +
+					allGood
+						.map((product) => {
+							return product.id + ": " + product.name;
+						})
+						.join("\n")
+			);
+		} else {
+			alert("Upload was successful");
+		}
+	};
+
+	const addPosterCSV = async () => {
+		const allGood: { id: string; name: string }[] = [];
+		for (const poster in postersCSV) {
+			const response = await fetch("/api/printify/add-poster", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					poster: postersCSV[poster],
+				}),
+			});
+			if (!response.ok) {
+				allGood.push({
+					id: postersCSV[poster].ID,
+					name: postersCSV[poster]["Product Name"],
+				});
+			}
+		}
+		if (allGood.length !== 0) {
 			alert(
 				"There was an issue with:\n" +
 					allGood
@@ -154,6 +188,51 @@ export default function AdminPage() {
 							onClick={addTshirtCSV}
 						>
 							Submit TShirt CSV
+						</button>
+						<input
+							type="file"
+							accept=".csv"
+							onChange={async (file) => {
+								const rows: DataRowPoster[] = [];
+								if (file.target.files) {
+									const tableText = await file.target.files[0].text();
+									const tableSplit = tableText
+										.split("\r\n")
+										.map((row: string) => row.split(","));
+									for (let i = 1; i < tableSplit.length; i++) {
+										const row: DataRowPoster = {
+											ID: tableSplit[i][0],
+											"Product Name": tableSplit[i][1],
+											'11"x14" Price': parseFloat(
+												tableSplit[i][2].replace(/[$]/g, "")
+											),
+											'12"x16" Price': parseFloat(
+												tableSplit[i][3].replace(/[$]/g, "")
+											),
+											'16"x20" Price': parseFloat(
+												tableSplit[i][4].replace(/[$]/g, "")
+											),
+											'20"x24" Price': parseFloat(
+												tableSplit[i][5].replace(/[$]/g, "")
+											),
+											'18"x24" Price': parseFloat(
+												tableSplit[i][6].replace(/[$]/g, "")
+											),
+											'24"x32" Price': parseFloat(
+												tableSplit[i][7].replace(/[$]/g, "")
+											),
+										};
+										rows.push(row);
+									}
+									setPostersCSV(rows);
+								}
+							}}
+						/>
+						<button
+							className="bg-blue-300 rounded px-2 py-1 w-fit"
+							onClick={addPosterCSV}
+						>
+							Submit Poster CSV
 						</button>
 					</div>
 				</div>
