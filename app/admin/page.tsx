@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import PrintifyProduct from "../utils/PrintifyProduct";
 
 import { checkPassword } from "../utils/CheckPassword";
-import { DataRowPoster } from "../utils/DataRowPoster";
+// import { DataRowPoster } from "../utils/DataRowPoster";
 import { DataRowTshirt } from "../utils/DataRowTshirt";
 
 export default function AdminPage() {
@@ -33,11 +33,11 @@ export default function AdminPage() {
 
 	useEffect(() => {
 		handlePasswordSubmit(true);
-	}, []);
+	});
 
 	const addTshirtCSV = async () => {
-		let allGood: {id: string, name: string}[] = [];
-		for (let tshirt in tshirtsCSV) {
+		const allGood: {id: string, name: string}[] = [];
+		for (const tshirt in tshirtsCSV) {
 			const response = await fetch("/api/printify/add-tshirt", {
 				method: "POST",
 				headers: {
@@ -56,7 +56,7 @@ export default function AdminPage() {
 		}
 		if(allGood) {
 			alert("There was an issue with:\n" + allGood.map((product) => {
-				product.id + ": " + product.name
+				return product.id + ": " + product.name
 			}).join("\n"))
 		} else {
 			alert("Upload was successful")
