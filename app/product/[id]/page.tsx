@@ -6,7 +6,11 @@ import Image from "next/image";
 import DropDown from "@/app/components/Dropdown";
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import TopBar from "@/app/components/TopBar";
-import { isValidPrintifyProduct, PrintifyProduct } from "@/app/utils/PrintifyProduct";
+import {
+	isValidPrintifyProduct,
+	PrintifyProduct,
+} from "@/app/utils/PrintifyProduct";
+import { SiZebpay } from "react-icons/si";
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -15,8 +19,8 @@ export default function ProductPage() {
 	const [error, setError] = useState<string | null>(null);
 	const [quantity, setQuantity] = useState<number>(1);
 	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
-	// const [type, setType] = useState<string>("");
-	console.log(product);
+	const [size, setSize] = useState("");
+	const [color, setColor] = useState("");
 
 	useEffect(() => {
 		if (!id) return;
@@ -29,7 +33,7 @@ export default function ProductPage() {
 					setLoading(false);
 					return;
 				}
-				console.log(isValidPrintifyProduct(data));
+				if (!isValidPrintifyProduct(data)) console.error("Data is not valid");
 				setProduct(data);
 				setLoading(false);
 			})
@@ -39,6 +43,13 @@ export default function ProductPage() {
 				setLoading(false);
 			});
 	}, [id]);
+
+	console.log(
+		product?.prices.find((price) => {
+			console.log();
+			return price.size === size;
+		})
+	);
 
 	return (
 		<div className="flex flex-col min-h-screen overflow-x-hidden">
@@ -106,14 +117,35 @@ export default function ProductPage() {
 							) : (
 								<p className="text-start w-full">No description available</p>
 							)}
-							{product.prices && (
+
+							<DropDown
+								displayList={product.prices
+									.filter((price) => price.price)
+									.map((price) => price.size)}
+								displayName={size || "Sizes"}
+								setType={setSize}
+							/>
+
+							{product.colors && (
 								<DropDown
-									displayList={product.prices
-										.filter((price) => price.price)
-										.map((price) => price.size)}
-									displayName="Types"
+									displayList={product.colors}
+									displayName={color || "Colors"}
+									setType={setColor}
 								/>
 							)}
+
+							<div className="text-xl">
+								{"Price: " +
+									(product.prices.find((price) => {
+										return price.size === size;
+									})
+										? "$" +
+										  product.prices.find((price) => {
+												return price.size === size;
+										  })?.price
+										: "Select Size to find Price")}
+							</div>
+
 							<div className="flex flex-row gap-x-2 items-center">
 								<div className="text-xl">Quantity: </div>
 								<textarea

@@ -43,15 +43,11 @@ export async function GET(
 					{ size: "3XL", price: tshirtData.triplexlprice },
 				],
 				product_type: "tshirt",
-				variants: [
-					{ id: "small", title: "Small", price: tshirtData.smallprice },
-					{ id: "medium", title: "Medium", price: tshirtData.mediumprice },
-					{ id: "large", title: "Large", price: tshirtData.largeprice },
-					{ id: "xl", title: "XL", price: tshirtData.xlprice },
-					{ id: "xxl", title: "2XL", price: tshirtData.doublexlprice },
-					{ id: "xxxl", title: "3XL", price: tshirtData.triplexlprice },
-				],
+				colors: tshirtData.colors,
+				created_at: tshirtData.created_at,
+				updated_at: tshirtData.updated_at
 			};
+			
 
 			tshirtResults.push(productData);
 		}

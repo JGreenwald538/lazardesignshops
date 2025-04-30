@@ -1,6 +1,6 @@
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, Dispatch, SetStateAction } from "react";
 
-export default function DropDown({displayName, displayList} : {displayName: string, displayList: string[]}) {
+export default function DropDown({displayName, displayList, setType} : {displayName: string, displayList: string[], setType: Dispatch<SetStateAction<string>>}) {
     const [clicked, setClicked] = useState(false);
     const dropdownRef = useRef<HTMLDivElement>(null);
 
@@ -23,14 +23,17 @@ export default function DropDown({displayName, displayList} : {displayName: stri
     return (
         <div ref={dropdownRef}>
             {clicked && (
-                <div className="bg-white absolute translate-y-8 rounded-md border-2 border-black">
+                <div className="bg-white absolute translate-y-8 rounded-md border-2 border-black flex flex-col">
                     {displayList.map((dropdown: string, index: number) => (
-                        <div
+                        <button
                             key={index.toString()}
-                            className="px-1 last:border-b-0 border-b-2 border-black"
+                            className="px-1 last:border-b-0 border-b-2 border-black text-lg"
+                            onClick={()=> {
+                                setType(dropdown)
+                            }}
                         >
                             {dropdown}
-                        </div>
+                        </button>
                     ))}
                 </div>
             )}

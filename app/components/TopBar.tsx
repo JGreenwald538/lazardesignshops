@@ -19,11 +19,11 @@ export default function TopBar() {
 			</Link>
 			<div className="md:w-full md:px-0 px-5 rounded flex md:flex-row flex-col py-5 items-center md:gap-y-0 gap-y-5">
 				<div className="flex-1 flex justify-self-start md:gap-x-5 md:ml-5 md:flex-row flex-col md:gap-y-0 gap-y-3">
-					<a className="text-xl bg-[#e35050] text-white rounded px-3 py-1 whitespace-pre">
-						{" Prints "}
+					<a className="text-xl bg-[#e35050] text-white rounded px-3 py-1 whitespace-pre" href={"/?f=posters"}>
+						{"Posters"}
 					</a>
-					<a className="text-xl bg-[#e35050] text-white rounded px-3 py-1">
-						Clothing
+					<a className="text-xl bg-[#e35050] text-white rounded px-3 py-1" href={"/?f=tshirts"}>
+						T-Shirts
 					</a>
 					<a className="text-xl bg-[#e35050] text-white rounded px-4 py-1 whitespace-pre">
 						{" Other "}

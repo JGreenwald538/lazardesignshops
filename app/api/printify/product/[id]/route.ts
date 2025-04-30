@@ -38,14 +38,9 @@ export async function GET(
 					{ size: "3XL", price: tshirtData.triplexlprice },
 				],
 				product_type: "tshirt",
-				variants: [
-					{ id: "small", title: "Small", price: tshirtData.smallprice },
-					{ id: "medium", title: "Medium", price: tshirtData.mediumprice },
-					{ id: "large", title: "Large", price: tshirtData.largeprice },
-					{ id: "xl", title: "XL", price: tshirtData.xlprice },
-					{ id: "xxl", title: "2XL", price: tshirtData.doublexlprice },
-					{ id: "xxxl", title: "3XL", price: tshirtData.triplexlprice },
-				],
+				colors: tshirtData.colors,
+				created_at: tshirtData.created_at,
+				updated_at: tshirtData.updated_at,
 			};
 
 			return NextResponse.json(productData, { status: 200 });
@@ -63,13 +58,16 @@ export async function GET(
 				description: posterData.description || "",
 				images: posterData.images,
 				product_type: "poster",
-				prices:
-				[{size: "11x14", price: posterData.price11by14},
-				{size: "12x16", price: posterData.price12by16},
-				{size: "16x20", price: posterData.price16by20},
-				{size: "20x24", price: posterData.price20by24},
-				{size: "18x24", price: posterData.price18by24},
-				{size: "24x32", price: posterData.price24by32}],
+				prices: [
+					{ size: "11x14", price: posterData.price11by14 },
+					{ size: "12x16", price: posterData.price12by16 },
+					{ size: "16x20", price: posterData.price16by20 },
+					{ size: "20x24", price: posterData.price20by24 },
+					{ size: "18x24", price: posterData.price18by24 },
+					{ size: "24x32", price: posterData.price24by32 },
+				],
+				created_at: posterData.created_at,
+				updated_at: posterData.updated_at,
 			};
 
 			return NextResponse.json(productData, { status: 200 });

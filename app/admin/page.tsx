@@ -80,7 +80,7 @@ export default function AdminPage() {
 				});
 			}
 		}
-		if (allGood) {
+		if (allGood.length !== 0) {
 			alert(
 				"There was an issue with:\n" +
 					allGood
