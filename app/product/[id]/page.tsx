@@ -10,7 +10,6 @@ import {
 	isValidPrintifyProduct,
 	PrintifyProduct,
 } from "@/app/utils/PrintifyProduct";
-import { SiZebpay } from "react-icons/si";
 
 export default function ProductPage() {
 	const { id } = useParams();
