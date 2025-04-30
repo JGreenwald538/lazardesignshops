@@ -4,15 +4,17 @@ import Link from "next/link";
 export default function ShopItem({
 	displayName,
 	imagePath,
+	filterType
 }: {
 	displayName: string;
 	imagePath: string;
+	filterType: string;
 }) {
 	return (
 		<div className="w-full justify-center flex">
 			<Link
 				className="flex flex-col border-2 border-black p-2 hover:opacity-70 md:w-[30rem] w-full rounded-md mt-6 items-center md:mx-auto mx-10"
-				href={`/`}
+				href={`/?f=${filterType}#items`}
 			>
 				<Image
 					src={imagePath}

@@ -6,45 +6,7 @@ import Image from "next/image";
 import DropDown from "@/app/components/Dropdown";
 import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import TopBar from "@/app/components/TopBar";
-
-interface PrintifyProduct {
-	id: string;
-	title: string;
-	description?: string;
-	images?: string[];
-	tags?: string[];
-	variants?: {
-		id: string;
-		title: string;
-		price: string;
-		sku: string;
-		available: boolean;
-		options?: { title: string; value: string }[];
-	}[];
-	created_at?: string;
-	updated_at?: string;
-	available?: boolean;
-	preview_url?: string;
-	shop_id?: string;
-	print_provider_id?: string;
-	blueprint?: {
-		id: string;
-		title: string;
-		preview_url: string;
-		created_at: string;
-		updated_at: string;
-		available: boolean;
-		images?: { src: string }[];
-	};
-	blueprint_id?: string;
-	created_by?: string;
-	updated_by?: string;
-	prices?: {
-		size: string;
-		price: string;
-	}[];
-	product_type?: string;
-}
+import { isValidPrintifyProduct, PrintifyProduct } from "@/app/utils/PrintifyProduct";
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -67,6 +29,7 @@ export default function ProductPage() {
 					setLoading(false);
 					return;
 				}
+				console.log(isValidPrintifyProduct(data));
 				setProduct(data);
 				setLoading(false);
 			})
@@ -145,7 +108,9 @@ export default function ProductPage() {
 							)}
 							{product.prices && (
 								<DropDown
-									displayList={product.prices.filter((price) => price.price).map((price) => (price.size))}
+									displayList={product.prices
+										.filter((price) => price.price)
+										.map((price) => price.size)}
 									displayName="Types"
 								/>
 							)}

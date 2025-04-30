@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import PrintifyProduct from "../utils/PrintifyProduct";
+import { PrintifyProduct } from "../utils/PrintifyProduct";
 
 import { checkPassword } from "../utils/CheckPassword";
 import { DataRowTshirt } from "../utils/DataRowTshirt";

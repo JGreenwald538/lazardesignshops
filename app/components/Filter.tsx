@@ -1,6 +1,10 @@
 import { useState, useEffect, useRef } from "react";
 
-const FilterList = ["Prints", "Clothing", "Other"];
+const FilterList = [
+	{ name: "Posters", query: "posters" },
+	{ name: "Tshirts", query: "tshirts" },
+	{ name: "Other", query: "other" },
+];
 
 export default function Filter() {
 	const [clicked, setClicked] = useState(false);
@@ -25,14 +29,15 @@ export default function Filter() {
 	return (
 		<div ref={filterRef}>
 			{clicked && (
-				<div className="bg-white absolute translate-y-8 rounded-md border-2 border-black">
-					{FilterList.map((filter: string, index: number) => (
-						<div
+				<div className="bg-white absolute translate-y-8 rounded-md border-2 border-black flex flex-col">
+					{FilterList.map((filter: {name: string, query: string}, index: number) => (
+						<a
+							href={"/?f=" + filter.query}
 							key={index.toString()}
 							className="px-1 last:border-b-0 border-b-2 border-black"
 						>
-							{filter}
-						</div>
+							{filter.name}
+						</a>
 					))}
 				</div>
 			)}
