@@ -30,7 +30,7 @@ export default function Home() {
 			let tshirts: PrintifyProduct[] = [];
 
 			try {
-				const res = await fetch("/api/printify/tshirts");
+				const res = await fetch("/api/database/tshirts");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
 				tshirts = data;
@@ -39,7 +39,7 @@ export default function Home() {
 			}
 
 			try {
-				const res = await fetch("/api/printify/posters");
+				const res = await fetch("/api/database/posters");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
 				posters = data;

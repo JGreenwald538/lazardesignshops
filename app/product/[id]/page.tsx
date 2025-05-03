@@ -24,7 +24,7 @@ export default function ProductPage() {
 	useEffect(() => {
 		if (!id) return;
 
-		fetch(`/api/printify/product/${id}`)
+		fetch(`/api/database/product/${id}`)
 			.then((res) => res.json())
 			.then((data) => {
 				if (data.error) {
@@ -42,13 +42,6 @@ export default function ProductPage() {
 				setLoading(false);
 			});
 	}, [id]);
-
-	console.log(
-		product?.prices.find((price) => {
-			console.log();
-			return price.size === size;
-		})
-	);
 
 	return (
 		<div className="flex flex-col min-h-screen overflow-x-hidden">

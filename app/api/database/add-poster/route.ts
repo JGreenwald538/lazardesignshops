@@ -41,19 +41,19 @@ export async function POST(req: NextRequest) {
 		const printifyProduct = await printifyResult.json() as {variants: {title: string}[], created_at: string, updated_at: string}
 
 		if (posterResult) {
-			await sql`UPDATE posters 
-            SET 
-            productname=${poster["Product Name"]}, 
-            price11by14=${poster['11"x14" Price']},
-            price12by16=${poster['12"x16" Price']},
-            price16by20=${poster['16"x20" Price']},
-            price20by24=${poster['20"x24" Price']},
-            price18by24=${poster['18"x24" Price']},
-			price24by32=${poster['24"x32" Price']},
-			created_at=${printifyProduct.created_at},
-			updated_at=${printifyProduct.updated_at}
-            WHERE
-            id=${poster.ID}`;
+			// await sql`UPDATE posters 
+            // SET 
+            // productname=${poster["Product Name"]}, 
+            // price11by14=${poster['11"x14" Price']},
+            // price12by16=${poster['12"x16" Price']},
+            // price16by20=${poster['16"x20" Price']},
+            // price20by24=${poster['20"x24" Price']},
+            // price18by24=${poster['18"x24" Price']},
+			// price24by32=${poster['24"x32" Price']},
+			// created_at=${printifyProduct.created_at},
+			// updated_at=${printifyProduct.updated_at}
+            // WHERE
+            // id=${poster.ID}`;
 
 			return NextResponse.json(
 				{ message: "Poster updated successfully" },

@@ -11,16 +11,18 @@ export async function POST(req: NextRequest) {
         );
     }
 
-    const { id, description, images }: { id: string, description: string, images: string[] } = await req.json();
+    const { id, description, imagesSource, updated_at }: { id: string, description: string, imagesSource: {src: string}[], updated_at: string } = await req.json();
 
     const sql = neon(DATABASE_URL);
+    const images = imagesSource.map((image) => image.src)
 
     try {
         await sql`
             UPDATE tshirts 
             SET 
                 description = ${description || ''},
-                images = ${images}
+                images = ${images},
+                updated_at = ${updated_at}
             WHERE id = ${id}
         `;
 

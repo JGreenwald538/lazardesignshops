@@ -1,13 +1,9 @@
 import { NextResponse } from "next/server";
 
-export async function GET(request: Request) {
+export async function GET() {
 	try {
 		const API_KEY = process.env.PRINTIFY_API_KEY;
 		const STORE_ID = process.env.PRINTIFY_STORE_ID;
-		const { searchParams } = new URL(request.url);
-
-		const limit = Number(searchParams.get("limit")) || 50; // Default to 50 unless specified
-		const after = searchParams.get("after") || ""; // Cursor-based pagination
 
 		if (!API_KEY || !STORE_ID) {
 			return NextResponse.json(
@@ -17,8 +13,7 @@ export async function GET(request: Request) {
 		}
 
 		// Construct API URL
-		let apiUrl = `https://api.printify.com/v1/shops/${STORE_ID}/products.json?limit=${limit}`;
-		if (after) apiUrl += `&after=${after}`; // Append cursor if availabl
+		const apiUrl = `https://api.printify.com/v1/shops/${STORE_ID}/products.json`;
 
 		// Fetch data
 		const response = await fetch(apiUrl, {

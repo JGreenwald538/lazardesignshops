@@ -40,6 +40,7 @@ export default function AdminPage() {
 	const [postersCSV, setPostersCSV] = useState<DataRowPoster[]>([]);
 	const tshirtInputRef = useRef<HTMLInputElement | null>(null);
 	const posterInputRef = useRef<HTMLInputElement | null>(null);
+	const [isSyncLoading, setIsSyncLoading] = useState(false);
 
 	const handlePasswordSubmit = (first: boolean) => {
 		checkPassword(password)
@@ -64,7 +65,7 @@ export default function AdminPage() {
 	const addTshirtCSV = async () => {
 		const allGood: { id: string; name: string }[] = [];
 		for (const tshirt in tshirtsCSV) {
-			const response = await fetch("/api/printify/add-tshirt", {
+			const response = await fetch("/api/database/add-tshirt", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -97,7 +98,7 @@ export default function AdminPage() {
 	const addPosterCSV = async () => {
 		const allGood: { id: string; name: string }[] = [];
 		for (const poster in postersCSV) {
-			const response = await fetch("/api/printify/add-poster", {
+			const response = await fetch("/api/database/add-poster", {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -137,36 +138,64 @@ export default function AdminPage() {
 							className="bg-blue-300 rounded px-2 py-1 w-fit "
 							onClick={async () => {
 								fetchInitial(setTshirts, setPosters);
+								setIsSyncLoading(true);
 								for (const poster of posters) {
-									await fetch("/api/printify/update-poster", {
-										method: "POST",
-										headers: {
-											"Content-Type": "application/json",
-										},
-										body: JSON.stringify({
-											id: poster.id,
-											description: poster.description,
-											images: poster.images,
-										}),
-									});
+									try {
+										// Fetch the product data and wait for the response
+										const res = await fetch(
+											`/api/printify/product/${poster.id}`
+										);
+										const productData = await res.json();
+
+										// Use the fetched data directly (don't rely on state updates)
+										await fetch("/api/database/update-poster", {
+											method: "POST",
+											headers: {
+												"Content-Type": "application/json",
+											},
+											body: JSON.stringify({
+												id: poster.id,
+												description: productData?.description || "",
+												imagesSource: productData?.images || [""],
+												updated_at: productData?.updated_at || "",
+											}),
+										});
+									} catch (err) {
+										console.error("Failed to fetch or update product:", err);
+									}
 								}
 								for (const tshirt of tshirts) {
-									await fetch("/api/printify/update-tshirt", {
-										method: "POST",
-										headers: {
-											"Content-Type": "application/json",
-										},
-										body: JSON.stringify({
-											id: tshirt.id,
-											description: tshirt.description,
-											images: tshirt.images,
-										}),
-									});
+									try {
+										// Fetch the product data and wait for the response
+										const res = await fetch(
+											`/api/printify/product/${tshirt.id}`
+										);
+										const productData = await res.json();
+
+										// Use the fetched data directly (don't rely on state updates)
+										await fetch("/api/database/update-poster", {
+											method: "POST",
+											headers: {
+												"Content-Type": "application/json",
+											},
+											body: JSON.stringify({
+												id: tshirt.id,
+												description: productData?.description || "",
+												imagesSource: productData?.images || [""],
+												updated_at: productData?.updated_at || "",
+											}),
+										});
+									} catch (err) {
+										console.error("Failed to fetch or update product:", err);
+									}
 								}
+								setIsSyncLoading(false);
+								alert("Everything has been synced!");
 							}}
 						>
 							Sync With Printify
 						</button>
+						{isSyncLoading && <div>Syncing...</div>}
 						<input
 							type="file"
 							accept=".csv"
@@ -316,7 +345,7 @@ const fetchInitial = async (
 	let posters: PrintifyProduct[] = [];
 	let shirts: PrintifyProduct[] = [];
 	try {
-		const res = await fetch("/api/printify/tshirts");
+		const res = await fetch("/api/database/tshirts");
 		const data = await res.json();
 		if (data.error) throw new Error(data.error);
 		shirts = data;
@@ -324,7 +353,7 @@ const fetchInitial = async (
 		console.error("Error fetching initial products:", error);
 	}
 	try {
-		const res = await fetch("/api/printify/posters");
+		const res = await fetch("/api/database/posters");
 		const data = await res.json();
 		if (data.error) throw new Error(data.error);
 		posters = data;
