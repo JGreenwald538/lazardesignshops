@@ -1,5 +1,5 @@
 export interface DataRowTshirt {
-	ID: string;
+	id: string;
 	"Product Name": string;
 	"Small Price": number | string;
 	"Medium Price": number | string;

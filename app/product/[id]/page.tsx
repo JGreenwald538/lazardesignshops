@@ -10,6 +10,7 @@ import {
 	isValidPrintifyProduct,
 	PrintifyProduct,
 } from "@/app/utils/PrintifyProduct";
+import printifyColors from "@/app/utils/PrintifyColors";
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -44,13 +45,13 @@ export default function ProductPage() {
 	}, [id]);
 
 	return (
-		<div className="flex flex-col min-h-screen overflow-x-hidden">
+		<div className="flex flex-col overflow-x-hidden">
 			<TopBar />
 			<div className="flex-grow flex items-center justify-center w-full">
 				{loading && <p>Loading product...</p>}
 				{error && <p style={{ color: "red" }}>{error}</p>}
 				{product && (
-					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full max-w-7xl">
+					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full">
 						{product.images && product.images.length > 0 && (
 							<div className="md:w-2/5 w-full max-w-md flex flex-col items-center gap-4 md:mb-0 mb-8">
 								{/* Main Image Display */}
@@ -89,7 +90,7 @@ export default function ProductPage() {
 							</div>
 						)}
 
-						<div className="flex flex-col justify-center md:w-1/2 w-full md:pl-8 max-w-xl gap-y-6 md:px-0 px-4">
+						<div className="flex flex-col justify-center md:w-1/2 w-full md:pl-8 gap-y-6 md:px-0 px-4 py-2">
 							<h1 className="text-3xl md:text-4xl font-bold text-left w-full break-words">
 								{product.title}
 							</h1>
@@ -117,13 +118,32 @@ export default function ProductPage() {
 								displayName={size || "Sizes"}
 								setType={setSize}
 							/>
-
 							{product.colors && (
-								<DropDown
-									displayList={product.colors}
-									displayName={color || "Colors"}
-									setType={setColor}
-								/>
+								<div className="items-center justify-center w-fit py-2 px-2 flex flex-row space-x-4 h-7">
+									{product.colors.map((buttonColor, index) => {
+										if (buttonColor in printifyColors)
+											return (
+												<div
+													className="border-black rounded-full h-7 w-7 flex items-center"
+													style={{
+														borderWidth: color === buttonColor ? "2px" : 0,
+													}}
+													key={index}
+												>
+													<button
+														className="rounded-full w-6 h-6 border-2 border-gray-300"
+														style={{
+															backgroundColor:
+																printifyColors[
+																	buttonColor as keyof typeof printifyColors
+																],
+														}}
+														onClick={() => setColor(buttonColor)}
+													/>
+												</div>
+											);
+									})}
+								</div>
 							)}
 
 							<div className="text-xl">

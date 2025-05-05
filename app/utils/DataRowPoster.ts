@@ -1,5 +1,5 @@
 export interface DataRowPoster {
-	ID: string;
+	id: string;
 	"Product Name": string;
 	'11"x14" Price': number | string;
 	'12"x16" Price': number | string;

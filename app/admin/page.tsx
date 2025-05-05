@@ -76,7 +76,7 @@ export default function AdminPage() {
 			});
 			if (!response.ok) {
 				allGood.push({
-					id: tshirtsCSV[tshirt].ID,
+					id: tshirtsCSV[tshirt].id,
 					name: tshirtsCSV[tshirt]["Product Name"],
 				});
 			}
@@ -109,7 +109,7 @@ export default function AdminPage() {
 			});
 			if (!response.ok) {
 				allGood.push({
-					id: postersCSV[poster].ID,
+					id: postersCSV[poster].id,
 					name: postersCSV[poster]["Product Name"],
 				});
 			}
@@ -140,54 +140,71 @@ export default function AdminPage() {
 								fetchInitial(setTshirts, setPosters);
 								setIsSyncLoading(true);
 								for (const poster of posters) {
-									try {
-										// Fetch the product data and wait for the response
-										const res = await fetch(
-											`/api/printify/product/${poster.id}`
-										);
-										const productData = await res.json();
-
-										// Use the fetched data directly (don't rely on state updates)
-										await fetch("/api/database/update-poster", {
-											method: "POST",
-											headers: {
-												"Content-Type": "application/json",
-											},
-											body: JSON.stringify({
-												id: poster.id,
-												description: productData?.description || "",
-												imagesSource: productData?.images || [""],
-												updated_at: productData?.updated_at || "",
-											}),
-										});
-									} catch (err) {
-										console.error("Failed to fetch or update product:", err);
+									
+									const newPoster = {
+										...poster,
+										"Product Name": poster.title,
+										'11"x14" Price': poster.prices.find(
+											(price) => price.size === "11x14"
+										)?.price,
+										'12"x16" Price': poster.prices.find(
+											(price) => price.size === "12x16"
+										)?.price,
+										'16"x20" Price': poster.prices.find(
+											(price) => price.size === "16x20"
+										)?.price,
+										'20"x24" Price': poster.prices.find(
+											(price) => price.size === "20x24"
+										)?.price,
+										'18"x24" Price': poster.prices.find(
+											(price) => price.size === "18x24"
+										)?.price,
+										'24"x32" Price': poster.prices.find(
+											(price) => price.size === "24x32"
+										)?.price,
 									}
+									await fetch("/api/database/add-poster", {
+										method: "POST",
+										headers: {
+											"Content-Type": "application/json",
+										},
+										body: JSON.stringify({
+											poster: newPoster,
+										}),
+									});
 								}
 								for (const tshirt of tshirts) {
-									try {
-										// Fetch the product data and wait for the response
-										const res = await fetch(
-											`/api/printify/product/${tshirt.id}`
-										);
-										const productData = await res.json();
-
-										// Use the fetched data directly (don't rely on state updates)
-										await fetch("/api/database/update-poster", {
-											method: "POST",
-											headers: {
-												"Content-Type": "application/json",
-											},
-											body: JSON.stringify({
-												id: tshirt.id,
-												description: productData?.description || "",
-												imagesSource: productData?.images || [""],
-												updated_at: productData?.updated_at || "",
-											}),
-										});
-									} catch (err) {
-										console.error("Failed to fetch or update product:", err);
+									const newTshirt = {
+										...tshirt,
+										"Product Name": tshirt.title,
+										"Small Price": tshirt.prices.find(
+											(price) => price.size === "Small"
+										)?.price,
+										"Medium Price": tshirt.prices.find(
+											(price) => price.size === "Medium"
+										)?.price,
+										"Large Price": tshirt.prices.find(
+											(price) => price.size === "Large"
+										)?.price,
+										"XL Price": tshirt.prices.find(
+											(price) => price.size === "XL"
+										)?.price,
+										"2XL Price": tshirt.prices.find(
+											(price) => price.size === "2XL"
+										)?.price,
+										"3XL Price": tshirt.prices.find(
+											(price) => price.size === "3XL"
+										)?.price,
 									}
+									await fetch("/api/database/add-tshirt", {
+										method: "POST",
+										headers: {
+											"Content-Type": "application/json",
+										},
+										body: JSON.stringify({
+											tshirt: newTshirt,
+										}),
+									});
 								}
 								setIsSyncLoading(false);
 								alert("Everything has been synced!");
@@ -220,7 +237,7 @@ export default function AdminPage() {
 									} else {
 										for (let i = 1; i < tableSplit.length; i++) {
 											const row: DataRowTshirt = {
-												ID: tableSplit[i][0],
+												id: tableSplit[i][0],
 												"Product Name": tableSplit[i][1],
 												"Small Price": parseFloat(
 													tableSplit[i][2].replace(/[$]/g, "")
@@ -278,7 +295,7 @@ export default function AdminPage() {
 									} else {
 										for (let i = 1; i < tableSplit.length; i++) {
 											const row: DataRowPoster = {
-												ID: tableSplit[i][0],
+												id: tableSplit[i][0],
 												"Product Name": tableSplit[i][1],
 												'11"x14" Price': parseFloat(
 													tableSplit[i][2].replace(/[$]/g, "")
