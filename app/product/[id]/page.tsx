@@ -60,7 +60,7 @@ export default function ProductPage() {
 			})
 				.then((res) => res.json())
 				.then((data) => {
-					console.log(data);
+					setVariantID(data.variantId);
 				});
 		} else if (size && color && product?.product_type === "tshirt") {
 			fetch("/api/printify/find-variant", {
@@ -80,6 +80,8 @@ export default function ProductPage() {
 				});
 		}
 	}, [color, size, id, product?.product_type]);
+
+	console.log(variantID);
 
 	return (
 		<div className="flex flex-col overflow-x-hidden h-screen">
@@ -250,8 +252,17 @@ export default function ProductPage() {
 											} else {
 												alert("Must select size before adding to cart");
 											}
+										} else {
+											await AddToCart(
+												variantID,
+												quantity,
+												product.prices.find((price) => {
+													return price.size === size;
+												})?.price || 0,
+												product.title,
+												product.id
+											);
 										}
-										AddToCart(variantID, quantity);
 									}}
 								>
 									Add to Cart

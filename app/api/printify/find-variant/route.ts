@@ -95,10 +95,8 @@ export async function POST(req: NextRequest) {
 				variants: { title: string; is_enabled: boolean; id: number }[];
 			};
 
-			console.log(convertPosterSizeFancy(size));
-
 			const variant = printifyProduct.variants.find((variant) => {
-                console.log(variant.title, convertPosterSizeRegular(size))
+                console.log(variant.title, convertPosterSizeFancy(size))
 				return (
 					variant.title.includes(convertPosterSizeFancy(size)) ||
 					variant.title.includes(convertPosterSizeRegular(size))
