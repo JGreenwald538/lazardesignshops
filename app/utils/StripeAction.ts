@@ -49,6 +49,13 @@ export async function fetchClientSecret() {
 					currency: "USD",
 				});
 
+				await stripe.products.update(
+					typeof price.product === "string" ? price.product : "",
+					{
+						images: [item.images[0]],
+					}
+				);
+
 				// Add to line items
 				lineItems.push({
 					price: price.id,

@@ -150,13 +150,17 @@ export default function ProductPage() {
 								<p className="text-start w-full">No description available</p>
 							)}
 
-							<DropDown
-								displayList={product.prices
-									.filter((price) => price.price)
-									.map((price) => price.size)}
-								displayName={size || "Sizes"}
-								setType={setSize}
-							/>
+							<div className="flex flex-row items-center space-x-5">
+								<DropDown
+									displayList={product.prices
+										.filter((price) => price.price)
+										.map((price) => price.size)}
+									displayName={size || "Sizes"}
+									setType={setSize}
+								/>
+								{color && <div className="text-xl">{color}</div>}
+							</div>
+
 							{product.colors && (
 								<div className="items-center justify-center w-fit py-2 px-2 flex flex-row space-x-4 h-7">
 									{product.colors.map((buttonColor, index) => {
@@ -260,7 +264,8 @@ export default function ProductPage() {
 													return price.size === size;
 												})?.price || 0,
 												product.title,
-												product.id
+												product.id,
+												product.images
 											);
 										}
 									}}
