@@ -20,7 +20,6 @@ export async function AddToCart(
         currentCart[indexOfVariant] = {variantID, price, quantity: currentCart[indexOfVariant].quantity + quantity, name, id}
     }
 	cookieStore.set("cart", JSON.stringify(currentCart));
-    console.log(currentCart)
 }
 
 export async function NumberInCart() {
@@ -45,5 +44,5 @@ export async function GetCart() {
 
 export async function EmptyCart() {
     const cookieStore = await cookies();
-    cookieStore.delete("cart");
+    cookieStore.delete("cart")
 }

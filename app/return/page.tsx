@@ -1,6 +1,10 @@
+"use server";
+
 import { redirect } from "next/navigation";
 import { stripe } from "../utils/Stripe";
 import { EmptyCart, GetCart } from "../utils/Cart";
+import Link from "next/link";
+import ClearCartButton from "../components/ClearCartButton";
 
 const STORE_ID = process.env.PRINTIFY_STORE_ID;
 const API_KEY = process.env.PRINTIFY_API_KEY;
@@ -34,11 +38,12 @@ export default async function Return({
 			return (
 				<section id="success">
 					<p>
-						Your payment was successful, but we couldn't find your cart items. A
-						confirmation email will be sent to {customerEmail}. If you have any
-						questions, please contact our support team.
+						Your payment was successful, but we couldn&apos;t find your cart
+						items. A confirmation email will be sent to {customerEmail}. If you
+						have any questions, please contact our support team.
 					</p>
 					<a href="mailto:orders@example.com">orders@example.com</a>
+					<ClearCartButton />
 				</section>
 			);
 		}
@@ -47,7 +52,7 @@ export default async function Return({
 			return {
 				variant_id: item.variantID,
 				quantity: item.quantity,
-				product_id: item.id.trim()
+				product_id: item.id.trim(),
 			};
 		});
 
@@ -92,7 +97,7 @@ export default async function Return({
 			const responseData = await response.json();
 
 			if (!response.ok) {
-				console.error("Printify API Error:", responseData);
+				// console.error("Printify API Error:", responseData);
 
 				// Still return success to user, but log the error for admins
 				return (
@@ -104,17 +109,18 @@ export default async function Return({
 						</p>
 						<p>
 							If you have any questions, please email{" "}
-							<a href="mailto:orders@example.com">orders@example.com</a>.
+							<Link href="mailto:orders@example.com">orders@example.com</Link>.
 						</p>
-						<a href="/" className="button">
+						<Link href="/" className="button">
 							Continue Shopping
-						</a>
+						</Link>
+						<ClearCartButton />
 					</section>
 				);
 			}
 
 			// Success! Empty the cart
-			// await EmptyCart();
+			await EmptyCart();
 
 			return (
 				<section id="success">
@@ -124,9 +130,10 @@ export default async function Return({
 						{customerEmail}. If you have any questions, please email{" "}
 						<a href="mailto:orders@example.com">orders@example.com</a>.
 					</p>
-					<a href="/" className="button">
+					<Link href="/" className="button">
 						Continue Shopping
-					</a>
+					</Link>
+					<ClearCartButton />
 				</section>
 			);
 		} catch (error) {
@@ -143,9 +150,10 @@ export default async function Return({
 						If you have any questions, please contact{" "}
 						<a href="mailto:orders@example.com">orders@example.com</a>.
 					</p>
-					<a href="/" className="button">
+					<Link href="/" className="button">
 						Continue Shopping
-					</a>
+					</Link>
+					<ClearCartButton />
 				</section>
 			);
 		}
