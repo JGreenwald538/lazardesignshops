@@ -12,7 +12,7 @@ const API_KEY = process.env.PRINTIFY_API_KEY;
 export default async function Return({
 	searchParams,
 }: {
-	searchParams: { session_id: string };
+	searchParams: Promise<{ session_id: string }>;
 }) {
 	const { session_id } = await searchParams;
 
