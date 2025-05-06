@@ -35,10 +35,10 @@ export async function GET(request: Request, { params }: { params: Promise<{ id: 
           const jsonError = JSON.parse(errorData);
           errorDetails = JSON.stringify(jsonError);
         } catch (e) {
-          errorDetails = e;
+          errorDetails = e as string;
         }
       } catch (e) {
-        errorDetails = e;
+        errorDetails = e as string;
         // If can't get text, use status
         errorDetails = response.statusText;
       }

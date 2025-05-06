@@ -11,6 +11,7 @@ import {
 	PrintifyProduct,
 } from "@/app/utils/PrintifyProduct";
 import printifyColors from "@/app/utils/PrintifyColors";
+import { AddToCart } from "@/app/utils/Cart";
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -21,6 +22,7 @@ export default function ProductPage() {
 	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
 	const [size, setSize] = useState("");
 	const [color, setColor] = useState("");
+	const [variantID, setVariantID] = useState(0);
 
 	useEffect(() => {
 		if (!id) return;
@@ -43,6 +45,41 @@ export default function ProductPage() {
 				setLoading(false);
 			});
 	}, [id]);
+
+	useEffect(() => {
+		if (size && product?.product_type === "poster") {
+			fetch("/api/printify/find-variant", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					size: size,
+					id: id,
+				}),
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					console.log(data);
+				});
+		} else if (size && color && product?.product_type === "tshirt") {
+			fetch("/api/printify/find-variant", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					size: size,
+					id: id,
+					color: color,
+				}),
+			})
+				.then((res) => res.json())
+				.then((data) => {
+					setVariantID(data.variantId);
+				});
+		}
+	}, [color, size]);
 
 	return (
 		<div className="flex flex-col overflow-x-hidden">
@@ -196,7 +233,27 @@ export default function ProductPage() {
 							</div>
 							<div className="text-xl">Estimated Shipping Time: 3-5 days</div>
 							<div className="flex flex-row gap-x-4">
-								<button className="bg-black text-white px-4 py-2 rounded-md">
+								<button
+									className="bg-black text-white px-4 py-2 rounded-md"
+									onClick={async () => {
+										if (!variantID) {
+											if (product?.product_type == "tshirt") {
+												if (!color && !size) {
+													alert(
+														"Must select color and size before adding to cart"
+													);
+												} else if (!color) {
+													alert("Must select color before adding to cart");
+												} else {
+													alert("Must select size before adding to cart");
+												}
+											} else {
+												alert("Must select size before adding to cart");
+											}
+										}
+										AddToCart(variantID, quantity);
+									}}
+								>
 									Add to Cart
 								</button>
 								<button className="bg-black text-white px-4 py-2 rounded-md">
