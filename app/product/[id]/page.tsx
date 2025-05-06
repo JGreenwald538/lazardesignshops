@@ -82,13 +82,13 @@ export default function ProductPage() {
 	}, [color, size, id, product?.product_type]);
 
 	return (
-		<div className="flex flex-col overflow-x-hidden">
+		<div className="flex flex-col overflow-x-hidden h-screen">
 			<TopBar />
-			<div className="flex-grow flex items-center justify-center w-full">
+			<div className="flex-grow flex items-center justify-center w-full h-full">
 				{loading && <p>Loading product...</p>}
 				{error && <p style={{ color: "red" }}>{error}</p>}
 				{product && (
-					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full">
+					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full ">
 						{product.images && product.images.length > 0 && (
 							<div className="md:w-2/5 w-full max-w-md flex flex-col items-center gap-4 md:mb-0 mb-8">
 								{/* Main Image Display */}
