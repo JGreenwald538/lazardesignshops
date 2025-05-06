@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useRef, useState } from "react";
 import ShopItem from "./components/ShopItem";
 import TopBar from "./components/TopBar";
 import Filter from "./components/Filter";
@@ -15,7 +15,8 @@ interface PrintifyProduct {
 	images: string[];
 }
 
-export default function Home() {
+// Create a separate component that uses useSearchParams
+function ProductsGrid() {
 	const [products, setProducts] = useState<PrintifyProduct[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const searchParams = useSearchParams();
@@ -65,7 +66,7 @@ export default function Home() {
 		};
 
 		fetchInitialProducts();
-	}, [filterType]); // Add filterType as dependency
+	}, [filterType]);
 
 	// Handle scrolling after products are loaded and rendered
 	useEffect(() => {
@@ -86,6 +87,33 @@ export default function Home() {
 	}, [isLoading, products, filterType]);
 
 	return (
+		<div
+			id="product-grid"
+			className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-8 w-full max-w-6xl px-4 items-center justify-center mb-6 mx-auto"
+			ref={itemsRef}
+		>
+			{isLoading ? (
+				<div className="col-span-full text-center py-8">
+					Loading products...
+				</div>
+			) : products.length === 0 ? (
+				<div className="col-span-full text-center py-8">No products found</div>
+			) : (
+				products.map((product) => (
+					<ShopItem
+						key={product.id}
+						displayName={product.title.split("|")[0]}
+						productId={product.id}
+						imagePath={product.images[0] || "/placeholder.jpg"}
+					/>
+				))
+			)}
+		</div>
+	);
+}
+
+export default function Home() {
+	return (
 		<div className="w-full max-w-full overflow-x-hidden flex flex-col justify-center items-center">
 			<TopBar />
 			<TickerComponent />
@@ -105,30 +133,9 @@ export default function Home() {
 					filterType="tshirts"
 				/>
 			</div>
-			<div
-				id="product-grid"
-				className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-8 w-full max-w-6xl px-4 items-center justify-center mb-6 mx-auto"
-				ref={itemsRef}
-			>
-				{isLoading ? (
-					<div className="col-span-full text-center py-8">
-						Loading products...
-					</div>
-				) : products.length === 0 ? (
-					<div className="col-span-full text-center py-8">
-						No products found
-					</div>
-				) : (
-					products.map((product) => (
-						<ShopItem
-							key={product.id}
-							displayName={product.title.split("|")[0]}
-							productId={product.id}
-							imagePath={product.images[0] || "/placeholder.jpg"}
-						/>
-					))
-				)}
-			</div>
+			<Suspense fallback={<div className="text-center py-8">Loading...</div>}>
+				<ProductsGrid />
+			</Suspense>
 		</div>
 	);
 }
