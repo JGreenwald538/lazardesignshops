@@ -79,7 +79,7 @@ export default function ProductPage() {
 					setVariantID(data.variantId);
 				});
 		}
-	}, [color, size]);
+	}, [color, size, id, product?.product_type]);
 
 	return (
 		<div className="flex flex-col overflow-x-hidden">
