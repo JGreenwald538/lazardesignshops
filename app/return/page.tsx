@@ -97,7 +97,7 @@ export default async function Return({
 			const responseData = await response.json();
 
 			if (!response.ok) {
-				// console.error("Printify API Error:", responseData);
+				console.error("Printify API Error:", responseData);
 
 				// Still return success to user, but log the error for admins
 				return (
