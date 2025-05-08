@@ -21,8 +21,16 @@ export async function POST(req: NextRequest) {
 	const apiUrl = `https://api.printify.com/v1/shops/${STORE_ID}/products/${tshirt.id.trim()}.json`;
 
 	function isSize(string: string) {
-		return string === "S" || string === "M" || string === "L" || string === "XL" || string === "2XL" || string === "3XL"
-		|| string === "4XL" || string === "5XL";
+		return (
+			string === "S" ||
+			string === "M" ||
+			string === "L" ||
+			string === "XL" ||
+			string === "2XL" ||
+			string === "3XL" ||
+			string === "4XL" ||
+			string === "5XL"
+		);
 	}
 
 	try {
@@ -41,22 +49,30 @@ export async function POST(req: NextRequest) {
 			);
 		}
 
-		const printifyProduct = await printifyResult.json() as {variants: {title: string, is_enabled: boolean}[], created_at: string, updated_at: string, images: {src: string}[]}
+		const printifyProduct = (await printifyResult.json()) as {
+			variants: { title: string; is_enabled: boolean }[];
+			created_at: string;
+			updated_at: string;
+			images: { src: string }[];
+			description: string;
+		};
 
-		const colors:string[] = [];
+		const colors: string[] = [];
 
-		const variants = printifyProduct.variants.filter((product)=>product.is_enabled)
+		const variants = printifyProduct.variants.filter(
+			(product) => product.is_enabled
+		);
 
 		for (const variant in variants) {
-			const titleList = variants[variant].title.split("/")
-			let color = ""
-			if(isSize(titleList[0].trim())) {
-				color = titleList[1].trim()
+			const titleList = variants[variant].title.split("/");
+			let color = "";
+			if (isSize(titleList[0].trim())) {
+				color = titleList[1].trim();
 			} else {
-				color = titleList[0].trim()
+				color = titleList[0].trim();
 			}
-			if(!(colors.indexOf(color) != -1)) {
-				colors.push(color)
+			if (!(colors.indexOf(color) != -1)) {
+				colors.push(color);
 			}
 		}
 
@@ -66,6 +82,7 @@ export async function POST(req: NextRequest) {
 			await sql`UPDATE tshirts 
             SET 
             productname=${tshirt["Product Name"]}, 
+			description=${printifyProduct.description},
             smallprice=${tshirt["Small Price"]},
             mediumprice=${tshirt["Medium Price"]},
             largeprice=${tshirt["Large Price"]},
@@ -75,7 +92,7 @@ export async function POST(req: NextRequest) {
 			colors=${colors},
 			created_at=${printifyProduct.created_at},
 			updated_at=${printifyProduct.updated_at},
-			images=${printifyProduct.images.map((image)=>image.src)}
+			images=${printifyProduct.images.map((image) => image.src)}
             WHERE
             id=${tshirt.id}`;
 
@@ -84,8 +101,10 @@ export async function POST(req: NextRequest) {
 				{ status: 200 }
 			);
 		} else {
-			await sql`INSERT INTO tshirts(id, productname, smallprice, mediumprice, largeprice, xlprice, doublexlprice, triplexlprice, colors, created_at, updated_at, images) 
-            VALUES (${tshirt.id}, 
+			await sql`INSERT INTO tshirts(id, description, productname, smallprice, mediumprice, largeprice, xlprice, doublexlprice, triplexlprice, colors, created_at, updated_at, images) 
+            VALUES (
+				${tshirt.id}, 
+				${printifyProduct.description},
                 ${tshirt["Product Name"]}, 
                 ${tshirt["Small Price"]}, 
                 ${tshirt["Medium Price"]}, 
@@ -96,8 +115,8 @@ export async function POST(req: NextRequest) {
 				${colors},
 				${printifyProduct.created_at},
 				${printifyProduct.updated_at},
-				${printifyProduct.images.map((image)=>image.src)})`
-				
+				${printifyProduct.images.map((image) => image.src)})`;
+
 			return NextResponse.json(
 				{ message: "Tshirt added successfully" },
 				{ status: 200 }

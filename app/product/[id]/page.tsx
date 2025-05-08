@@ -81,8 +81,6 @@ export default function ProductPage() {
 		}
 	}, [color, size, id, product?.product_type]);
 
-	console.log(variantID);
-
 	return (
 		<div className="flex flex-col overflow-x-hidden h-screen">
 			<TopBar />
@@ -92,7 +90,7 @@ export default function ProductPage() {
 				{product && (
 					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full ">
 						{product.images && product.images.length > 0 && (
-							<div className="md:w-2/5 w-full max-w-md flex flex-col items-center gap-4 md:mb-0 mb-8">
+							<div className="w-2/5 max-w-md flex flex-col items-center gap-4 md:mb-0">
 								{/* Main Image Display */}
 								<div className="w-full relative">
 									<Image

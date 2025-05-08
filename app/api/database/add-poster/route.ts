@@ -42,12 +42,14 @@ export async function POST(req: NextRequest) {
 			created_at: string;
 			updated_at: string;
 			images: { src: string }[];
+			description: string;
 		};
 
 		if (posterResult.length !== 0) {
 			await sql`UPDATE posters 
             SET 
             productname=${poster["Product Name"]}, 
+			description=${printifyProduct.description},
             price11by14=${poster['11"x14" Price']},
             price12by16=${poster['12"x16" Price']},
             price16by20=${poster['16"x20" Price']},
@@ -65,9 +67,10 @@ export async function POST(req: NextRequest) {
 				{ status: 200 }
 			);
 		} else {
-			await sql`INSERT INTO posters (id, productname, price11by14, price12by16, price16by20, price20by24, price18by24, price24by32, created_at, updated_at, images) 
+			await sql`INSERT INTO posters (id, description, productname, price11by14, price12by16, price16by20, price20by24, price18by24, price24by32, created_at, updated_at, images) 
             VALUES (${poster.id}, 
                 ${poster["Product Name"]}, 
+				${printifyProduct.description},
                 ${poster['11"x14" Price']}, 
                 ${poster['12"x16" Price']}, 
                 ${poster['16"x20" Price']}, 
