@@ -8,12 +8,7 @@ import SortBy from "./components/SortBy";
 import TickerComponent from "./components/Ticker";
 import PopularItem from "./components/PopularItem";
 import { useSearchParams } from "next/navigation";
-
-interface PrintifyProduct {
-	id: string;
-	title: string;
-	images: string[];
-}
+import { PrintifyProduct } from "./utils/PrintifyProduct";
 
 // Create a separate component that uses useSearchParams
 function ProductsGrid() {
@@ -21,6 +16,7 @@ function ProductsGrid() {
 	const [isLoading, setIsLoading] = useState(true);
 	const searchParams = useSearchParams();
 	const filterType = searchParams.get("f");
+	const sortByType = searchParams.get("s");
 	const itemsRef = useRef<HTMLDivElement>(null);
 
 	// Fetch products
@@ -59,8 +55,46 @@ function ProductsGrid() {
 				allProducts.push(...tshirts);
 			}
 
-			// Randomize product order
-			allProducts = allProducts.sort(() => Math.random() - 0.5);
+			if (sortByType === "priceasec") {
+				allProducts.sort((product1, product2) => {
+					const price1 = product1.prices[0]?.price || 0;
+					const price2 = product2.prices[0]?.price || 0;
+					return price1 - price2;
+				});
+			} else if (sortByType === "pricedesc") {
+				allProducts.sort((product1, product2) => {
+					const price1 = product1.prices[0]?.price || 0;
+					const price2 = product2.prices[0]?.price || 0;
+					return price2 - price1;
+				});
+			} else if (sortByType === "alphaasec") {
+				allProducts.sort((product1, product2) => {
+					const name1 = product1.title || "";
+					const name2 = product2.title || "";
+					return name1.localeCompare(name2);
+				});
+			} else if (sortByType === "alphadesc") {
+				allProducts.sort((product1, product2) => {
+					const name1 = product1.title || "";
+					const name2 = product2.title || "";
+					return name2.localeCompare(name1);
+				});
+			} else if (sortByType === "releaseasec") {
+				allProducts.sort((product1, product2) => {
+					const date1 = product1.created_at || "";
+					const date2 = product2.created_at || "";
+					return date2.localeCompare(date1);
+				});
+			} else if (sortByType === "releasedesc") {
+				allProducts.sort((product1, product2) => {
+					const date1 = product1.created_at || "";
+					const date2 = product2.created_at || "";
+					return date1.localeCompare(date2);
+				});
+			} else {
+				allProducts = allProducts.sort(() => Math.random() - 0.5);
+			}
+
 			setProducts(allProducts);
 			setIsLoading(false);
 		};

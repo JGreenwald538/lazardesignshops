@@ -1,3 +1,4 @@
+import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
 
 const FilterList = [
@@ -26,13 +27,16 @@ export default function Filter() {
 		};
 	}, []);
 
+	const searchParams = useSearchParams();
+	const sortByType = searchParams.get("s");
+
 	return (
 		<div ref={filterRef}>
 			{clicked && (
 				<div className="bg-white absolute translate-y-8 rounded-md border-2 border-black flex flex-col">
 					{FilterList.map((filter: {name: string, query: string}, index: number) => (
 						<a
-							href={"/?f=" + filter.query}
+							href={`/?f=${filter.query}&s=${sortByType}`}
 							key={index.toString()}
 							className="px-1 last:border-b-0 border-b-2 border-black"
 						>

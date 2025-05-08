@@ -39,6 +39,9 @@ export default function ProductPage() {
 				}
 				if (!isValidPrintifyProduct(data)) console.error("Data is not valid");
 				setProduct(data);
+				if (data?.colors?.length === 1) {
+					setColor(data?.colors[0]);
+				}
 				setLoading(false);
 			})
 			.catch((err) => {
@@ -82,6 +85,8 @@ export default function ProductPage() {
 				});
 		}
 	}, [color, size, id, product?.product_type]);
+
+	console.log(product?.colors);
 
 	return (
 		<div className="flex flex-col overflow-x-hidden h-screen">
@@ -164,7 +169,7 @@ export default function ProductPage() {
 								{color && <div className="text-xl">{color}</div>}
 							</div>
 
-							{product.colors && (
+							{product.colors && product.colors.length !== 0 && (
 								<div className="items-center justify-center w-fit py-2 px-2 flex flex-row space-x-4 h-7">
 									{product.colors.map((buttonColor, index) => {
 										if (buttonColor in printifyColors)

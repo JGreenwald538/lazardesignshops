@@ -56,6 +56,7 @@ const printifyColors = {
   "Emerald Triblend": "#173f35",
   "Espresso": "#392d2b",
   "Evergreen": "#115740",
+  "Faded Cream": "F6F1DE",
   "Forest": "#183028",
   "French Vanilla": "#f1e19b",
   "Fuchsia": "#db0a5b",

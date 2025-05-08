@@ -1,4 +1,5 @@
 import { DataRowTshirt } from "@/app/utils/DataRowTshirt";
+import printifyColors from "@/app/utils/PrintifyColors";
 import { neon } from "@neondatabase/serverless";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -71,7 +72,7 @@ export async function POST(req: NextRequest) {
 			} else {
 				color = titleList[0].trim();
 			}
-			if (!(colors.indexOf(color) != -1)) {
+			if (!(colors.indexOf(color) != -1) && Object.keys(printifyColors).includes(color)) {
 				colors.push(color);
 			}
 		}
