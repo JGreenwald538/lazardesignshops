@@ -44,7 +44,7 @@ export async function POST(req: NextRequest) {
 			images: { src: string }[];
 		};
 
-		if (posterResult) {
+		if (posterResult.length !== 0) {
 			await sql`UPDATE posters 
             SET 
             productname=${poster["Product Name"]}, 

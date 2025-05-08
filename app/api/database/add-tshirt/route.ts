@@ -47,8 +47,6 @@ export async function POST(req: NextRequest) {
 
 		const variants = printifyProduct.variants.filter((product)=>product.is_enabled)
 
-		console.log(tshirt)
-
 		for (const variant in variants) {
 			const titleList = variants[variant].title.split("/")
 			let color = ""
@@ -64,7 +62,7 @@ export async function POST(req: NextRequest) {
 
 		const tshirtResult = await sql`SELECT * FROM tshirts WHERE id = ${tshirt.id}`;
 
-		if (tshirtResult) {
+		if (tshirtResult.length !== 0) {
 			await sql`UPDATE tshirts 
             SET 
             productname=${tshirt["Product Name"]}, 
@@ -86,7 +84,7 @@ export async function POST(req: NextRequest) {
 				{ status: 200 }
 			);
 		} else {
-			await sql`INSERT INTO tshirts (id, productname, smallprice, mediumprice, largeprice, xlprice, doublexlprice, triplexlprice, colors, created_at, updated_at, images) 
+			await sql`INSERT INTO tshirts(id, productname, smallprice, mediumprice, largeprice, xlprice, doublexlprice, triplexlprice, colors, created_at, updated_at, images) 
             VALUES (${tshirt.id}, 
                 ${tshirt["Product Name"]}, 
                 ${tshirt["Small Price"]}, 
