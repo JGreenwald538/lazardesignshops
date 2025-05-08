@@ -83,14 +83,17 @@ export default function ProductPage() {
 
 	return (
 		<div className="flex flex-col overflow-x-hidden h-screen">
+			{/* Fixed position TopBar with higher z-index */}
 			<TopBar />
-			<div className="flex-grow flex items-center justify-center w-full h-full">
+
+			{/* Main content with proper spacing from TopBar */}
+			<div className="flex-grow flex items-center justify-center w-full pt-4">
 				{loading && <p>Loading product...</p>}
 				{error && <p style={{ color: "red" }}>{error}</p>}
 				{product && (
-					<div className="flex md:flex-row flex-col items-center justify-center mt-4 w-full ">
+					<div className="flex md:flex-row flex-col items-center justify-center w-full">
 						{product.images && product.images.length > 0 && (
-							<div className="w-2/5 max-w-md flex flex-col items-center gap-4 md:mb-0">
+							<div className="w-2/5 max-w-md flex flex-col items-center gap-4 md:mb-0 z-10">
 								{/* Main Image Display */}
 								<div className="w-full relative">
 									<Image
