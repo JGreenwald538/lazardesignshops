@@ -12,6 +12,7 @@ import {
 } from "@/app/utils/PrintifyProduct";
 import printifyColors from "@/app/utils/PrintifyColors";
 import { AddToCart } from "@/app/utils/Cart";
+import Link from "next/link";
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -23,6 +24,7 @@ export default function ProductPage() {
 	const [size, setSize] = useState("");
 	const [color, setColor] = useState("");
 	const [variantID, setVariantID] = useState(0);
+	const [addToCartPressed, setAddToCartPressed] = useState(false);
 
 	useEffect(() => {
 		if (!id) return;
@@ -241,6 +243,41 @@ export default function ProductPage() {
 							<div className="text-xl">Estimated Shipping Time: 3-5 days</div>
 							<div className="flex flex-row gap-x-4">
 								<button
+									className="bg-black text-white py-2 rounded-md w-32"
+									onClick={async () => {
+										if (!variantID) {
+											if (product?.product_type == "tshirt") {
+												if (!color && !size) {
+													alert(
+														"Must select color and size before adding to cart"
+													);
+												} else if (!color) {
+													alert("Must select color before adding to cart");
+												} else {
+													alert("Must select size before adding to cart");
+												}
+											} else {
+												alert("Must select size before adding to cart");
+											}
+										} else {
+											setAddToCartPressed(true);
+											setTimeout(() => setAddToCartPressed(false), 1500);
+											await AddToCart(
+												variantID,
+												quantity,
+												product.prices.find((price) => {
+													return price.size === size;
+												})?.price || 0,
+												product.title,
+												product.id,
+												product.images
+											);
+										}
+									}}
+								>
+									{addToCartPressed ? "Added!" : "Add to Cart"}
+								</button>
+								<Link
 									className="bg-black text-white px-4 py-2 rounded-md"
 									onClick={async () => {
 										if (!variantID) {
@@ -258,6 +295,8 @@ export default function ProductPage() {
 												alert("Must select size before adding to cart");
 											}
 										} else {
+											setAddToCartPressed(true);
+											setTimeout(() => setAddToCartPressed(false), 1500);
 											await AddToCart(
 												variantID,
 												quantity,
@@ -270,12 +309,10 @@ export default function ProductPage() {
 											);
 										}
 									}}
+									href={"/checkout"}
 								>
-									Add to Cart
-								</button>
-								<button className="bg-black text-white px-4 py-2 rounded-md">
 									Buy Now
-								</button>
+								</Link>
 							</div>
 						</div>
 					</div>
