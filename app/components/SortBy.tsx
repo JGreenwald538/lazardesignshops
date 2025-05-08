@@ -1,6 +1,6 @@
-import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef } from "react";
+import { FaArrowDown, FaArrowUp } from "react-icons/fa6";
 
 const SortByList = [
 	{ title: "Price", param: "price" },
@@ -38,14 +38,22 @@ export default function Filter() {
 				<div className="bg-white absolute translate-y-8 rounded-md border-2 border-black flex flex-col">
 					{SortByList.map(
 						(filter: { title: string; param: string }, index: number) => {
-							const order = sortByType === filter.param + "asec" ? "desc" : "asec"
+							const order =
+								sortByType === filter.param + "asec" ? "desc" : "asec";
 							return (
 								<a
 									key={index.toString()}
-									className="px-1 last:border-b-0 border-b-2 border-black"
+									className="px-1 last:border-b-0 border-b-2 border-black flex flex-row items-center"
 									href={`/?f=${filterType}&s=${filter.param}${order}`}
 								>
-									{filter.title}
+									<div>{filter.title}</div>
+									{sortByType === filter.param + "desc" ? (
+										<FaArrowDown />
+									) : sortByType === filter.param + "asec" ? (
+										<FaArrowUp />
+									) : (
+										<FaArrowUp color="gray" />
+									)}
 								</a>
 							);
 						}
