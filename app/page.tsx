@@ -100,7 +100,7 @@ function ProductsGrid() {
 		};
 
 		fetchInitialProducts();
-	}, [filterType]);
+	}, [filterType, sortByType]); // Added sortByType to dependency array
 
 	// Handle scrolling after products are loaded and rendered
 	useEffect(() => {
@@ -146,6 +146,12 @@ function ProductsGrid() {
 	);
 }
 
+// Client Component that uses useSearchParams
+function ProductsWithSearch() {
+	return <ProductsGrid />;
+}
+
+// Main page component
 export default function Home() {
 	return (
 		<div className="w-full max-w-full overflow-x-hidden flex flex-col justify-center items-center">
@@ -168,7 +174,7 @@ export default function Home() {
 				/>
 			</div>
 			<Suspense fallback={<div className="text-center py-8">Loading...</div>}>
-				<ProductsGrid />
+				<ProductsWithSearch />
 			</Suspense>
 		</div>
 	);

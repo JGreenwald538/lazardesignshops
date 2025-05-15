@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Montserrat } from "next/font/google";
 import "./globals.css";
+import { Suspense } from "react";
 
 // const geistSans = Geist({
 // 	variable: "--font-geist-sans",
@@ -58,7 +59,7 @@ export default function RootLayout({
 			<body
 				className={`${montserrat.variable} antialiased bg-[#FCF5EE] text-black`}
 			>
-				{children}
+				<Suspense>{children}</Suspense>
 			</body>
 		</html>
 	);
