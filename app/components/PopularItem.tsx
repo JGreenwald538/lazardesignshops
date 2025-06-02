@@ -13,7 +13,7 @@ export default function ShopItem({
 	return (
 		<div className="w-full justify-center flex">
 			<Link
-				className="flex flex-col border-2 border-black p-2 hover:opacity-70 md:w-[30rem] w-full rounded-md mt-6 items-center md:mx-auto mx-10"
+				className="flex flex-col p-2 hover:opacity-70 md:w-[30rem] w-full rounded-md mt-6 items-center md:mx-auto mx-10"
 				href={`/?f=${filterType}#items`}
 			>
 				<Image

@@ -164,12 +164,12 @@ export default function Home() {
 			<div className="flex md:flex-row flex-col p-2 md:my-4 my-0 rounded-xl md:justify-around justify-center gap-x-8 gap-y-4 w-full">
 				<PopularItem
 					displayName="Posters"
-					imagePath="/postersImage.jpg"
+					imagePath="/chromaposter mock.png"
 					filterType="posters"
 				/>
 				<PopularItem
 					displayName="T-Shirts"
-					imagePath="/LazarDesign.banner.png"
+					imagePath="/passionshirt mock.png"
 					filterType="tshirts"
 				/>
 			</div>

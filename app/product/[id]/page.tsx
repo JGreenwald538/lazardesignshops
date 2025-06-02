@@ -129,6 +129,7 @@ export default function ProductPage() {
 												alt={`${product.title} thumbnail ${index + 1}`}
 												width={80}
 												height={80}
+												priority
 												className="object-cover w-16 h-16"
 											/>
 										</div>

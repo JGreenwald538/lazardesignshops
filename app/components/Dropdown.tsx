@@ -41,7 +41,7 @@ export default function DropDown({
 				{displayName}
 			</button>
 			{clicked && (
-				<div className="bg-white absolute top-full left-0 mt-1 rounded-md border-2 border-black flex flex-col z-20">
+				<div className="bg-white absolute left-0 rounded-md border-2 border-black flex flex-col z-20">
 					{displayList.map((dropdown: string, index: number) => (
 						<button
 							key={index.toString()}
