@@ -11,8 +11,8 @@ export default async function Checkout() {
 	return (
 		<div className="h-screen">
 			<TopBar />
-			<div className="flex flex-col w-screen h-full">
-				<div className="flex-1 mx-10 my-10 flex flex-col">
+			<div className="flex flex-col flex-1 overflow-auto">
+				<div className="mx-10 my-10 flex flex-col">
 					<div className="flex mb-4 justify-between lg:flex-row flex-col lg:items-center items-start">
 						<div>
 							<div className="">Shopping Cart</div>

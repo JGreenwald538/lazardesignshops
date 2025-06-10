@@ -2,7 +2,7 @@
 
 import { headers } from "next/headers";
 import { stripe } from "./Stripe";
-import { GetCart } from "./Cart";
+import { GetCart, GetCartTotal } from "./Cart";
 
 export async function fetchClientSecret() {
 	try {
@@ -69,6 +69,20 @@ export async function fetchClientSecret() {
 
 		if (lineItems.length === 0) {
 			throw new Error("No valid items could be processed");
+		}
+
+		if (await GetCartTotal() < 35) {
+			const shippingPrice = await stripe.prices.create({
+				product_data: {
+					name: "Shipping Fee",
+				},
+				unit_amount: 500, // Flat rate of $5.00
+				currency: "USD",
+			})
+			lineItems.push({
+				price: shippingPrice.id,
+				quantity: 1,
+			});
 		}
 
 		// Create Checkout Session
