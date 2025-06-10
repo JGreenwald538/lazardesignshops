@@ -34,7 +34,14 @@ export async function AddToCart(
 			images,
 		};
 	}
-	cookieStore.set("cart", JSON.stringify(currentCart));
+
+	console.log(JSON.stringify(currentCart).split("").length + 4 )
+	if(JSON.stringify(currentCart).split("").length + 4 > 2300) {
+		return "Cart is too large";
+	} else {
+		cookieStore.delete("cart"); // Clear existing cart cookie to avoid duplicates
+		cookieStore.set("cart", JSON.stringify(currentCart).trim());
+	}
 }
 
 export async function NumberInCart() {
@@ -70,4 +77,52 @@ export async function GetCart() {
 export async function EmptyCart() {
 	const cookieStore = await cookies();
 	cookieStore.delete("cart");
+}
+
+export async function SetItemQuantity(variantID:number, quantity:number) {
+	const cookieStore = await cookies();
+	const currentCart: {
+		variantID: number;
+		price: number;
+		quantity: number;
+		name: string;
+		id: string;
+		images: string[];
+	}[] = JSON.parse(cookieStore.get("cart")?.value || "[]");
+	currentCart[currentCart.findIndex((item)=>item.variantID === variantID)].quantity = quantity;
+	cookieStore.set("cart", JSON.stringify(currentCart));
+}
+
+export async function RemoveItem(variantID: number) {
+	const cookieStore = await cookies();
+	const currentCart: {
+		variantID: number;
+		price: number;
+		quantity: number;
+		name: string;
+		id: string;
+		images: string[];
+	}[] = JSON.parse(cookieStore.get("cart")?.value || "[]");
+	const index = currentCart.findIndex((item) => item.variantID === variantID);
+	if (index !== -1) {
+		currentCart.splice(index, 1);
+		cookieStore.set("cart", JSON.stringify(currentCart));
+	}
+}
+
+export async function GetCartTotal() {
+	const cookieStore = await cookies();
+	const currentCart: {
+		variantID: number;
+		price: number;
+		quantity: number;
+		name: string;
+		id: string;
+		images: string[];
+	}[] = JSON.parse(cookieStore.get("cart")?.value || "[]");
+	let total = 0;
+	for (const item of currentCart) {
+		total += item.price * item.quantity;
+	}
+	return total;
 }

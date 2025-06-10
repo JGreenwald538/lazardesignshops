@@ -268,7 +268,7 @@ export default function ProductPage() {
 										} else {
 											setAddToCartPressed(true);
 											setTimeout(() => setAddToCartPressed(false), 1500);
-											await AddToCart(
+											const response = await AddToCart(
 												variantID,
 												quantity,
 												product.prices.find((price) => {
@@ -276,8 +276,11 @@ export default function ProductPage() {
 												})?.price || 0,
 												product.title,
 												product.id,
-												product.images
+												[product.images[0]]
 											);
+											if (response) {
+												alert(response)
+											}
 										}
 									}}
 								>

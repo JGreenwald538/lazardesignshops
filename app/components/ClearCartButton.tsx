@@ -6,9 +6,11 @@ export default function ClearCartButton() {
 	return (
 		<button
 			onClick={async () => {
-				await EmptyCart();
+				if (window.confirm("Are you sure you want to clear the cart?")) {
+					await EmptyCart();
+				}
 			}}
-			className="bg-black text-white px-4 py-2 rounded-md mt-4"
+			className="bg-[#e35050] text-white px-4 py-2 rounded-md mt-4"
 		>
 			Clear Cart
 		</button>
