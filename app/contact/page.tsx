@@ -290,6 +290,7 @@ const ContactPage = () => {
 										width={320}
 										height={640}
 										className="rounded-2xl"
+										priority
 									/>{" "}
 								</div>
 							</Link>
