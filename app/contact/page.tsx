@@ -5,6 +5,7 @@ import React from "react";
 import TopBar from "../components/TopBar";
 import Image from "next/image";
 import Link from "next/link";
+import InstagramEmbed from "../components/Instagram";
 
 const ContactPage = () => {
 	return (
@@ -278,22 +279,7 @@ const ContactPage = () => {
 					<div className="flex-1 flex justify-center">
 						<div className="relative">
 							{/* Phone Frame */}
-							<Link
-								href="https://www.instagram.com/lazardesigns_/"
-								target="_blank"
-							>
-								<div className="max-w-[320px] border-[8px] border-black rounded-3xl overflow-hidden shadow-xl">
-									{" "}
-									<Image
-										src={"/Instagram.png"}
-										alt="Instagram Profile"
-										width={320}
-										height={640}
-										className="rounded-2xl"
-										priority
-									/>{" "}
-								</div>
-							</Link>
+							<InstagramEmbed />
 						</div>
 					</div>
 				</div>
