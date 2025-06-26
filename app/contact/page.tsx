@@ -3,7 +3,6 @@
 import React from "react";
 // import { Instagram, Mail } from "lucide-react";
 import TopBar from "../components/TopBar";
-import Image from "next/image";
 import Link from "next/link";
 import InstagramEmbed from "../components/Instagram";
 
