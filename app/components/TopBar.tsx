@@ -35,7 +35,7 @@ export default function TopBar() {
 						{"Posters"}
 					</a>
 					<a
-						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center"
+						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center text-nowrap"
 						href={"/?f=tshirts"}
 					>
 						T-Shirts
@@ -59,7 +59,7 @@ export default function TopBar() {
 						Contact
 					</Link>
 					<Link
-						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center"
+						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center text-nowrap"
 						href={"/customorder"}
 					>
 						Custom Order
