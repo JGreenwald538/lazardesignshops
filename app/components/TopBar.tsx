@@ -13,7 +13,7 @@ export default function TopBar() {
 		NumberInCart().then((number) => setCartNumber(number));
 	});
 	return (
-		<div className="lg:px-24 px-10 pt-8 w-full flex lg:flex-row flex-col justify-between items-center lg:space-y-0 space-y-5">
+		<div className="lg:px-24 px-10 pt-8 w-full flex lg:flex-row flex-col justify-between items-center lg:space-y-0 space-y-5 z-50">
 			<Link
 				href={"/"}
 				className="object-scale-down lg:w-[12%] w-1/2 justify-start mr-4"
