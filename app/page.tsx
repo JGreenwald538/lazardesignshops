@@ -157,11 +157,11 @@ export default function Home() {
 		<div className="w-full max-w-full overflow-x-hidden flex flex-col justify-center items-center">
 			<TopBar />
 			<TickerComponent />
-			<div className="flex flex-row w-full max-w-4xl px-4 p-2 md:my-4 my-0 rounded-xl justify-between">
+			<div className="flex flex-row w-full max-w-4xl px-4 p-2 lg:my-4 my-0 rounded-xl justify-between">
 				<Filter />
 				<SortBy />
 			</div>
-			<div className="flex md:flex-row flex-col p-2 md:my-4 my-0 rounded-xl md:justify-around justify-center gap-x-8 gap-y-4 w-full">
+			<div className="flex lg:flex-row flex-col p-2 lg:my-4 my-0 rounded-xl justify-center gap-x-72 gap-y-4 w-full">
 				<PopularItem
 					displayName="Posters"
 					imagePath="/chromaposter mock.png"

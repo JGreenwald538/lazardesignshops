@@ -11,19 +11,18 @@ export default function ShopItem({
 	filterType: string;
 }) {
 	return (
-		<div className="w-full justify-center flex">
+		<div className="justify-center flex">
 			<Link
-				className="flex flex-col p-2 hover:opacity-70 md:w-[30rem] w-full rounded-md mt-6 items-center md:mx-auto mx-10"
+				className="flex flex-col p-2 hover:opacity-70 rounded-md mt-6 items-center md:mx-auto"
 				href={`/?f=${filterType}#items`}
 			>
 				<Image
 					src={imagePath}
-					alt=""
+					alt={displayName + " image"}
 					width={2000}
 					height={2000}
 					className="w-96 object-scale-down"
-					unoptimized
-					loading="lazy"
+					priority
 				/>
 				<div className="text-3xl font-bold">{displayName}</div>
 			</Link>
