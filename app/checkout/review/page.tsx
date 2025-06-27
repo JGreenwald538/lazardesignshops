@@ -22,7 +22,7 @@ export default async function Checkout() {
 								items in your cart
 							</div>
 						</div>
-						<ClearCartButton />
+						{cart.length > 0 && <ClearCartButton />}
 					</div>
 					<div className="flex flex-col">
 						{cart.length === 0 ? (
@@ -41,15 +41,15 @@ export default async function Checkout() {
 						)}
 					</div>
 				</div>
-				<div className="flex justify-center pb-10">
+				<Link className="flex justify-center pb-10 hover:transform hover:scale-105 transition" href={"/checkout"}>
 					<div className="flex justify-between bg-[#CC6060] w-3/4 py-4 px-4 rounded-xl text-white">
 						<div>Total ${total}</div>
-						<div>
-							<Link href={"/checkout"}>Checkout</Link>
+						<div className="flex items-center flex-row">
+							<div>Checkout</div>
 							<FaArrowRightLong className="inline ml-2" />
 						</div>
 					</div>
-				</div>
+				</Link>
 			</div>
 		</div>
 	);
