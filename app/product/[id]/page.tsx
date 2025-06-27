@@ -109,6 +109,7 @@ export default function ProductPage() {
 										width={4000}
 										height={4000}
 										className="object-contain w-full h-auto"
+										priority
 									/>
 								</div>
 
@@ -131,6 +132,7 @@ export default function ProductPage() {
 												height={80}
 												priority
 												className="object-cover w-16 h-16"
+												unoptimized
 											/>
 										</div>
 									))}
