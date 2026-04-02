@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
 import DropDown from "@/app/components/Dropdown";
@@ -26,54 +26,59 @@ export default function ProductPage() {
 	const [variantID, setVariantID] = useState(0);
 	const [addToCartPressed, setAddToCartPressed] = useState(false);
 
-	const resolveVariantID = async (
-		selectedSize = size,
-		selectedColor = color,
-		throwOnError = true,
-	) => {
-		if (!id || !product) return 0;
+	const resolveVariantID = useCallback(
+		async (
+			selectedSize: string,
+			selectedColor: string,
+			throwOnError = true,
+		) => {
+			if (!id || !product) return 0;
 
-		if (product.product_type === "poster") {
-			if (!selectedSize) return 0;
-		} else if (!selectedSize || !selectedColor) {
-			return 0;
-		}
-
-		const response = await fetch("/api/printify/find-variant", {
-			method: "POST",
-			headers: {
-				"Content-Type": "application/json",
-			},
-			body: JSON.stringify({
-				size: selectedSize,
-				id,
-				...(product.product_type === "tshirt" ? { color: selectedColor } : {}),
-			}),
-		});
-
-		const responseText = await response.text();
-		let data: { variantId?: number; error?: string } = {};
-
-		if (responseText) {
-			try {
-				data = JSON.parse(responseText) as {
-					variantId?: number;
-					error?: string;
-				};
-			} catch {
-				data = { error: "Variant lookup returned an invalid response" };
+			if (product.product_type === "poster") {
+				if (!selectedSize) return 0;
+			} else if (!selectedSize || !selectedColor) {
+				return 0;
 			}
-		}
 
-		if (!response.ok) {
-			if (throwOnError) {
-				throw new Error(data.error || "Failed to look up product variant");
+			const response = await fetch("/api/printify/find-variant", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					size: selectedSize,
+					id,
+					...(product.product_type === "tshirt"
+						? { color: selectedColor }
+						: {}),
+				}),
+			});
+
+			const responseText = await response.text();
+			let data: { variantId?: number; error?: string } = {};
+
+			if (responseText) {
+				try {
+					data = JSON.parse(responseText) as {
+						variantId?: number;
+						error?: string;
+					};
+				} catch {
+					data = { error: "Variant lookup returned an invalid response" };
+				}
 			}
-			return 0;
-		}
 
-		return data.variantId || 0;
-	};
+			if (!response.ok) {
+				if (throwOnError) {
+					throw new Error(data.error || "Failed to look up product variant");
+				}
+				return 0;
+			}
+
+			return data.variantId || 0;
+		},
+		[id, product],
+	);
 
 	useEffect(() => {
 		if (!id) return;
@@ -110,7 +115,7 @@ export default function ProductPage() {
 			.catch(() => {
 				setVariantID(0);
 			});
-	}, [color, size, id, product]);
+	}, [color, size, id, product, resolveVariantID]);
 
 	const handleAddToCart = async (images: string[]) => {
 		if (!product) return;

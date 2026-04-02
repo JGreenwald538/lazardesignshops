@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 
 export async function POST(req: NextRequest) {
-	const API_KEY = process.env.PRINTIFY_API_KEY;
-	const STORE_ID = process.env.PRINTIFY_STORE_ID;
+	const API_KEY = process.env.PRINTIFY_API_KEY?.trim();
+	const STORE_ID = process.env.PRINTIFY_STORE_ID?.trim();
 
 	if (!API_KEY || !STORE_ID) {
 		return NextResponse.json(
@@ -11,11 +11,10 @@ export async function POST(req: NextRequest) {
 		);
 	}
 
-	const {
-		id,
-		size,
-		color,
-	}: { id?: string; size?: string; color?: string } = await req.json();
+	const payload: { id?: string; size?: string; color?: string } = await req.json();
+	const id = payload.id?.trim();
+	const size = payload.size?.trim();
+	const color = payload.color?.trim();
 
 	if (!id || !size) {
 		return NextResponse.json(

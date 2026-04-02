@@ -2,10 +2,8 @@
 
 import { redirect } from "next/navigation";
 import { stripe } from "../utils/Stripe";
-import { EmptyCart, GetCart } from "../utils/Cart";
-import ClearCartButton from "../components/ClearCartButton";
+import { GetCart } from "../utils/Cart";
 import TopBar from "../components/TopBar";
-import { cookies } from "next/headers";
 import ClearCartOnMount from "../components/ClearCartOnMount";
 
 const STORE_ID = process.env.PRINTIFY_STORE_ID;
