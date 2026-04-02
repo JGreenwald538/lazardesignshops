@@ -345,7 +345,7 @@ export default function ProductPage() {
 									onClick={async () => {
 										await handleAddToCart(product.images);
 									}}
-									href={"/checkout"}
+									href={"/checkout/review"}
 								>
 									Buy Now
 								</Link>
