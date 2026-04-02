@@ -4,11 +4,25 @@ export async function POST(req: NextRequest) {
 	const API_KEY = process.env.PRINTIFY_API_KEY;
 	const STORE_ID = process.env.PRINTIFY_STORE_ID;
 
+	if (!API_KEY || !STORE_ID) {
+		return NextResponse.json(
+			{ error: "Missing Printify configuration" },
+			{ status: 500 }
+		);
+	}
+
 	const {
 		id,
 		size,
 		color,
-	}: { id: string; size: string; color: string } = await req.json();
+	}: { id?: string; size?: string; color?: string } = await req.json();
+
+	if (!id || !size) {
+		return NextResponse.json(
+			{ error: "Missing product id or size" },
+			{ status: 400 }
+		);
+	}
 
 	const convertSize = {
 		Small: "S",
@@ -43,15 +57,21 @@ export async function POST(req: NextRequest) {
 			const printifyResult = await fetch(apiUrl, {
 				headers: {
 					Authorization: `Bearer ${API_KEY}`,
+					"User-Agent": "lazardesignshops-server",
 					"Content-Type": "application/json",
 				},
 			});
 
-			if (!printifyResult) {
-				console.error("Not valid ID: " + id);
+			if (!printifyResult.ok) {
+				const errorText = await printifyResult.text();
+				console.error("Printify request failed:", printifyResult.status, errorText);
+				const errorMessage =
+					printifyResult.status === 401
+						? "Printify authentication failed (check PRINTIFY_API_KEY and PRINTIFY_STORE_ID)"
+						: "Failed to find Printify variant";
 				return NextResponse.json(
-					{ error: "Failed to add poster" },
-					{ status: 500 }
+					{ error: errorMessage },
+					{ status: printifyResult.status }
 				);
 			}
 
@@ -62,16 +82,27 @@ export async function POST(req: NextRequest) {
 			const variant = printifyProduct.variants.find(
 				(variant) =>
 					variant.title ===
-						convertSize[size as keyof typeof convertSize] + " / " + color ||
+					convertSize[size as keyof typeof convertSize] + " / " + color ||
 					variant.title ===
-						color + " / " + convertSize[size as keyof typeof convertSize]
+					color + " / " + convertSize[size as keyof typeof convertSize]
 			);
 
 			const variantId = variant?.id;
 
-			return NextResponse.json({ variantId: variantId }, { status: 200 });
+			if (!variantId) {
+				return NextResponse.json(
+					{ error: "No matching Printify variant found" },
+					{ status: 404 }
+				);
+			}
+
+			return NextResponse.json({ variantId }, { status: 200 });
 		} catch (e) {
 			console.error(e);
+			return NextResponse.json(
+				{ error: "Failed to find Printify variant" },
+				{ status: 500 }
+			);
 		}
 	} else {
 		// poster
@@ -79,15 +110,21 @@ export async function POST(req: NextRequest) {
 			const printifyResult = await fetch(apiUrl, {
 				headers: {
 					Authorization: `Bearer ${API_KEY}`,
+					"User-Agent": "lazardesignshops-server",
 					"Content-Type": "application/json",
 				},
 			});
 
-			if (!printifyResult) {
-				console.error("Not valid ID: " + id);
+			if (!printifyResult.ok) {
+				const errorText = await printifyResult.text();
+				console.error("Printify request failed:", printifyResult.status, errorText);
+				const errorMessage =
+					printifyResult.status === 401
+						? "Printify authentication failed (check PRINTIFY_API_KEY and PRINTIFY_STORE_ID)"
+						: "Failed to find Printify variant";
 				return NextResponse.json(
-					{ error: "Failed to add poster" },
-					{ status: 500 }
+					{ error: errorMessage },
+					{ status: printifyResult.status }
 				);
 			}
 
@@ -96,7 +133,7 @@ export async function POST(req: NextRequest) {
 			};
 
 			const variant = printifyProduct.variants.find((variant) => {
-                console.log(variant.title, convertPosterSizeFancy(size))
+				console.log(variant.title, convertPosterSizeFancy(size));
 				return (
 					variant.title.includes(convertPosterSizeFancy(size)) ||
 					variant.title.includes(convertPosterSizeRegular(size))
@@ -105,9 +142,20 @@ export async function POST(req: NextRequest) {
 
 			const variantId = variant?.id;
 
-			return NextResponse.json({ variantId: variantId }, { status: 200 });
+			if (!variantId) {
+				return NextResponse.json(
+					{ error: "No matching Printify variant found" },
+					{ status: 404 }
+				);
+			}
+
+			return NextResponse.json({ variantId }, { status: 200 });
 		} catch (e) {
 			console.error(e);
+			return NextResponse.json(
+				{ error: "Failed to find Printify variant" },
+				{ status: 500 }
+			);
 		}
 	}
 }

@@ -26,6 +26,55 @@ export default function ProductPage() {
 	const [variantID, setVariantID] = useState(0);
 	const [addToCartPressed, setAddToCartPressed] = useState(false);
 
+	const resolveVariantID = async (
+		selectedSize = size,
+		selectedColor = color,
+		throwOnError = true,
+	) => {
+		if (!id || !product) return 0;
+
+		if (product.product_type === "poster") {
+			if (!selectedSize) return 0;
+		} else if (!selectedSize || !selectedColor) {
+			return 0;
+		}
+
+		const response = await fetch("/api/printify/find-variant", {
+			method: "POST",
+			headers: {
+				"Content-Type": "application/json",
+			},
+			body: JSON.stringify({
+				size: selectedSize,
+				id,
+				...(product.product_type === "tshirt" ? { color: selectedColor } : {}),
+			}),
+		});
+
+		const responseText = await response.text();
+		let data: { variantId?: number; error?: string } = {};
+
+		if (responseText) {
+			try {
+				data = JSON.parse(responseText) as {
+					variantId?: number;
+					error?: string;
+				};
+			} catch {
+				data = { error: "Variant lookup returned an invalid response" };
+			}
+		}
+
+		if (!response.ok) {
+			if (throwOnError) {
+				throw new Error(data.error || "Failed to look up product variant");
+			}
+			return 0;
+		}
+
+		return data.variantId || 0;
+	};
+
 	useEffect(() => {
 		if (!id) return;
 
@@ -52,39 +101,67 @@ export default function ProductPage() {
 	}, [id]);
 
 	useEffect(() => {
-		if (size && product?.product_type === "poster") {
-			fetch("/api/printify/find-variant", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					size: size,
-					id: id,
-				}),
+		if (!product) return;
+
+		resolveVariantID(size, color, false)
+			.then((resolvedVariantID) => {
+				setVariantID(resolvedVariantID);
 			})
-				.then((res) => res.json())
-				.then((data) => {
-					setVariantID(data.variantId);
-				});
-		} else if (size && color && product?.product_type === "tshirt") {
-			fetch("/api/printify/find-variant", {
-				method: "POST",
-				headers: {
-					"Content-Type": "application/json",
-				},
-				body: JSON.stringify({
-					size: size,
-					id: id,
-					color: color,
-				}),
-			})
-				.then((res) => res.json())
-				.then((data) => {
-					setVariantID(data.variantId);
-				});
+			.catch(() => {
+				setVariantID(0);
+			});
+	}, [color, size, id, product]);
+
+	const handleAddToCart = async (images: string[]) => {
+		if (!product) return;
+
+		if (!size) {
+			alert("Must select size before adding to cart");
+			return;
 		}
-	}, [color, size, id, product?.product_type]);
+
+		if (product.product_type === "tshirt" && !color) {
+			alert("Must select color before adding to cart");
+			return;
+		}
+
+		let resolvedVariantID = variantID;
+		if (!resolvedVariantID) {
+			try {
+				resolvedVariantID = await resolveVariantID(size, color, true);
+			} catch (resolveError) {
+				const errorMessage =
+					resolveError instanceof Error
+						? resolveError.message
+						: "Failed to look up product variant";
+				alert(errorMessage);
+				return;
+			}
+		}
+
+		if (!resolvedVariantID) {
+			alert("Could not find a matching size/color variant for this product");
+			return;
+		}
+
+		setVariantID(resolvedVariantID);
+		setAddToCartPressed(true);
+		setTimeout(() => setAddToCartPressed(false), 1500);
+
+		const response = await AddToCart(
+			resolvedVariantID,
+			quantity,
+			product.prices.find((price) => {
+				return price.size === size;
+			})?.price || 0,
+			product.title,
+			product.id,
+			images,
+		);
+		if (response) {
+			alert(response);
+		}
+	};
 
 	console.log(product?.colors);
 
@@ -206,9 +283,9 @@ export default function ProductPage() {
 										return price.size === size;
 									})
 										? "$" +
-										  product.prices.find((price) => {
+											product.prices.find((price) => {
 												return price.size === size;
-										  })?.price
+											})?.price
 										: "Select Size to find Price")}
 							</div>
 
@@ -253,37 +330,7 @@ export default function ProductPage() {
 								<button
 									className="bg-black text-white py-2 rounded-md w-32"
 									onClick={async () => {
-										if (!variantID) {
-											if (product?.product_type == "tshirt") {
-												if (!color && !size) {
-													alert(
-														"Must select color and size before adding to cart"
-													);
-												} else if (!color) {
-													alert("Must select color before adding to cart");
-												} else {
-													alert("Must select size before adding to cart");
-												}
-											} else {
-												alert("Must select size before adding to cart");
-											}
-										} else {
-											setAddToCartPressed(true);
-											setTimeout(() => setAddToCartPressed(false), 1500);
-											const response = await AddToCart(
-												variantID,
-												quantity,
-												product.prices.find((price) => {
-													return price.size === size;
-												})?.price || 0,
-												product.title,
-												product.id,
-												[product.images[0]]
-											);
-											if (response) {
-												alert(response)
-											}
-										}
+										await handleAddToCart([product.images[0]]);
 									}}
 								>
 									{addToCartPressed ? "Added!" : "Add to Cart"}
@@ -291,34 +338,7 @@ export default function ProductPage() {
 								<Link
 									className="bg-black text-white px-4 py-2 rounded-md"
 									onClick={async () => {
-										if (!variantID) {
-											if (product?.product_type == "tshirt") {
-												if (!color && !size) {
-													alert(
-														"Must select color and size before adding to cart"
-													);
-												} else if (!color) {
-													alert("Must select color before adding to cart");
-												} else {
-													alert("Must select size before adding to cart");
-												}
-											} else {
-												alert("Must select size before adding to cart");
-											}
-										} else {
-											setAddToCartPressed(true);
-											setTimeout(() => setAddToCartPressed(false), 1500);
-											await AddToCart(
-												variantID,
-												quantity,
-												product.prices.find((price) => {
-													return price.size === size;
-												})?.price || 0,
-												product.title,
-												product.id,
-												product.images
-											);
-										}
+										await handleAddToCart(product.images);
 									}}
 									href={"/checkout"}
 								>
