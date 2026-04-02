@@ -1,6 +1,7 @@
 "use server";
 
 import { headers } from "next/headers";
+import type Stripe from "stripe";
 import { stripe } from "./Stripe";
 import { GetCart, GetCartTotal } from "./Cart";
 
@@ -86,16 +87,17 @@ export async function fetchClientSecret() {
 		}
 
 		// Create Checkout Session
-		const session = await stripe.checkout.sessions.create({
-			ui_mode: "embedded",
+		const sessionParams: Stripe.Checkout.SessionCreateParams = {
+			ui_mode: "embedded_page",
 			line_items: lineItems,
 			mode: "payment",
 			return_url: `${origin}/return?session_id={CHECKOUT_SESSION_ID}`,
-      shipping_address_collection: {
-        allowed_countries: ["US"],
-      },
-      billing_address_collection: "required", // Collect full billing address
-		});
+			shipping_address_collection: {
+				allowed_countries: ["US"],
+			},
+			billing_address_collection: "required", // Collect full billing address
+		};
+		const session = await stripe.checkout.sessions.create(sessionParams);
 
 		if (!session.client_secret) {
 			throw new Error("Failed to create checkout session");

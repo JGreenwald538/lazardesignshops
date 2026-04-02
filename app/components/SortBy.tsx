@@ -1,5 +1,5 @@
 import { useSearchParams } from "next/navigation";
-import { useState, useEffect, useRef } from "react";
+import { useState, useEffect, useRef, useCallback } from "react";
 import { FaArrowDown, FaArrowUp } from "react-icons/fa6";
 
 const SortByList = [
@@ -12,52 +12,70 @@ export default function Filter() {
 	const [clicked, setClicked] = useState(false);
 	const filterRef = useRef<HTMLDivElement>(null);
 	const searchParams = useSearchParams();
+	const closeTimerRef = useRef<number | null>(null);
 
 	const [shouldRender, setShouldRender] = useState(false);
 	const [isAnimating, setIsAnimating] = useState(false);
 
-	const handleClickOutside = (event: MouseEvent) => {
-		if (
-			filterRef.current &&
-			!filterRef.current.contains(event.target as Node)
-		) {
-			setClicked(false);
+	const openMenu = useCallback(() => {
+		if (closeTimerRef.current) {
+			window.clearTimeout(closeTimerRef.current);
+			closeTimerRef.current = null;
 		}
-	};
+		setShouldRender(true);
+		setClicked(true);
+
+		requestAnimationFrame(() => {
+			requestAnimationFrame(() => {
+				setIsAnimating(true);
+			});
+		});
+	}, []);
+
+	const closeMenu = useCallback(() => {
+		if (closeTimerRef.current) {
+			window.clearTimeout(closeTimerRef.current);
+		}
+		setClicked(false);
+		setIsAnimating(false);
+		closeTimerRef.current = window.setTimeout(() => {
+			setShouldRender(false);
+			closeTimerRef.current = null;
+		}, 200);
+	}, []);
+
+	const toggleMenu = useCallback(() => {
+		if (clicked) {
+			closeMenu();
+			return;
+		}
+		openMenu();
+	}, [clicked, closeMenu, openMenu]);
+
+	const handleClickOutside = useCallback(
+		(event: MouseEvent) => {
+			if (
+				filterRef.current &&
+				!filterRef.current.contains(event.target as Node)
+			) {
+				closeMenu();
+			}
+		},
+		[closeMenu],
+	);
 
 	useEffect(() => {
 		document.addEventListener("mousedown", handleClickOutside);
 		return () => {
 			document.removeEventListener("mousedown", handleClickOutside);
+			if (closeTimerRef.current) {
+				window.clearTimeout(closeTimerRef.current);
+			}
 		};
-	}, []);
+	}, [handleClickOutside]);
 
 	const filterType = searchParams.get("f");
 	const sortByType = searchParams.get("s");
-
-	useEffect(() => {
-		if (clicked) {
-			// Solution 1: Render element first
-			setShouldRender(true);
-
-			// Solution 2: Force initial state, then animate
-			// Use double RAF to ensure DOM is rendered and styled
-			requestAnimationFrame(() => {
-				requestAnimationFrame(() => {
-					setIsAnimating(true);
-				});
-			});
-		} else {
-			// Closing animation
-			setIsAnimating(false);
-
-			// Solution 3: Wait for animation to complete before removing
-			const timer = setTimeout(() => {
-				setShouldRender(false);
-			}, 200);
-			return () => clearTimeout(timer);
-		}
-	}, [clicked]);
 
 	return (
 		<div ref={filterRef} className="relative inline-block">
@@ -98,7 +116,7 @@ export default function Filter() {
 									)}
 								</a>
 							);
-						}
+						},
 					)}
 				</div>
 			)}
@@ -106,9 +124,7 @@ export default function Filter() {
 				className={`bg-[#e35050] text-white ${
 					clicked ? "rounded-t" : "rounded"
 				} px-4 text-xl font-semibold`}
-				onClick={() => {
-					setClicked(!clicked);
-				}}
+				onClick={toggleMenu}
 			>
 				Sort By
 			</button>
