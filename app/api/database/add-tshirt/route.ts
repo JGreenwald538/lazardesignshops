@@ -1,5 +1,4 @@
 import { DataRowTshirt } from "@/app/utils/DataRowTshirt";
-import printifyColors from "@/app/utils/PrintifyColors";
 import { neon } from "@neondatabase/serverless";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -58,6 +57,11 @@ export async function POST(req: NextRequest) {
 			description: string;
 		};
 
+		const colorResult = await sql`SELECT name FROM colors`;
+		const validColorNames = new Set(
+			colorResult.map((color) => String(color.name))
+		);
+
 		const colors: string[] = [];
 
 		const variants = printifyProduct.variants.filter(
@@ -72,7 +76,7 @@ export async function POST(req: NextRequest) {
 			} else {
 				color = titleList[0].trim();
 			}
-			if (!(colors.indexOf(color) != -1) && Object.keys(printifyColors).includes(color)) {
+			if (!(colors.indexOf(color) != -1) && validColorNames.has(color)) {
 				colors.push(color);
 			}
 		}

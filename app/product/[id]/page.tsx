@@ -10,9 +10,13 @@ import {
 	isValidPrintifyProduct,
 	PrintifyProduct,
 } from "@/app/utils/PrintifyProduct";
-import printifyColors from "@/app/utils/PrintifyColors";
 import { AddToCart } from "@/app/utils/Cart";
 import Link from "next/link";
+
+type ColorRecord = {
+	name: string;
+	hex: string;
+};
 
 export default function ProductPage() {
 	const { id } = useParams();
@@ -25,6 +29,7 @@ export default function ProductPage() {
 	const [color, setColor] = useState("");
 	const [variantID, setVariantID] = useState(0);
 	const [addToCartPressed, setAddToCartPressed] = useState(false);
+	const [colorMap, setColorMap] = useState<Record<string, string>>({});
 
 	const resolveVariantID = useCallback(
 		async (
@@ -106,6 +111,24 @@ export default function ProductPage() {
 	}, [id]);
 
 	useEffect(() => {
+		fetch("/api/database/colors")
+			.then((res) => res.json())
+			.then((data: ColorRecord[] | { error?: string }) => {
+				if (Array.isArray(data)) {
+					setColorMap(
+						data.reduce<Record<string, string>>((accumulator, color) => {
+							accumulator[color.name] = color.hex;
+							return accumulator;
+						}, {}),
+					);
+				}
+			})
+			.catch((error) => {
+				console.error("Failed to fetch colors:", error);
+			});
+	}, []);
+
+	useEffect(() => {
 		if (!product) return;
 
 		resolveVariantID(size, color, false)
@@ -176,7 +199,7 @@ export default function ProductPage() {
 			<TopBar />
 
 			{/* Main content with proper spacing from TopBar */}
-			<div className="flex-grow flex items-center justify-center w-full pt-4">
+			<div className="grow flex items-center justify-center w-full pt-4">
 				{loading && <p>Loading product...</p>}
 				{error && <p style={{ color: "red" }}>{error}</p>}
 				{product && (
@@ -223,7 +246,7 @@ export default function ProductPage() {
 						)}
 
 						<div className="flex flex-col justify-center md:w-1/2 w-full md:pl-8 gap-y-6 md:px-0 px-4 py-2">
-							<h1 className="text-3xl md:text-4xl font-bold text-left w-full break-words">
+							<h1 className="text-3xl md:text-4xl font-bold text-left w-full wrap-break-word">
 								{product.title}
 							</h1>
 							{product.description ? (
@@ -233,7 +256,7 @@ export default function ProductPage() {
 										.map((text: string, index: number) => (
 											<p
 												key={index.toString()}
-												className="text-start w-full break-words mb-2"
+												className="text-start w-full wrap-break-word mb-2"
 											>
 												{text.trim()}
 											</p>
@@ -257,7 +280,7 @@ export default function ProductPage() {
 							{product.colors && product.colors.length !== 0 && (
 								<div className="items-center justify-center w-fit py-2 px-2 flex flex-row space-x-4 h-7">
 									{product.colors.map((buttonColor, index) => {
-										if (buttonColor in printifyColors)
+										if (buttonColor in colorMap)
 											return (
 												<div
 													className="border-black rounded-full h-7 w-7 flex items-center"
@@ -269,10 +292,7 @@ export default function ProductPage() {
 													<button
 														className="rounded-full w-6 h-6 border-2 border-gray-300"
 														style={{
-															backgroundColor:
-																printifyColors[
-																	buttonColor as keyof typeof printifyColors
-																],
+															backgroundColor: colorMap[buttonColor],
 														}}
 														onClick={() => setColor(buttonColor)}
 													/>
