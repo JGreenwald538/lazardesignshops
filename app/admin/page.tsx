@@ -41,6 +41,9 @@ export default function AdminPage() {
 	const tshirtInputRef = useRef<HTMLInputElement | null>(null);
 	const posterInputRef = useRef<HTMLInputElement | null>(null);
 	const [isSyncLoading, setIsSyncLoading] = useState(false);
+	const [manualColorName, setManualColorName] = useState("");
+	const [manualColorHex, setManualColorHex] = useState("");
+	const [isManualColorLoading, setIsManualColorLoading] = useState(false);
 
 	const handlePasswordSubmit = (first: boolean) => {
 		checkPassword(password)
@@ -88,7 +91,7 @@ export default function AdminPage() {
 						.map((product) => {
 							return product.id + ": " + product.name;
 						})
-						.join("\n")
+						.join("\n"),
 			);
 		} else {
 			alert("Upload was successful");
@@ -121,10 +124,50 @@ export default function AdminPage() {
 						.map((product) => {
 							return product.id + ": " + product.name;
 						})
-						.join("\n")
+						.join("\n"),
 			);
 		} else {
 			alert("Upload was successful");
+		}
+	};
+
+	const addSingleColor = async () => {
+		if (!manualColorName.trim() || !manualColorHex.trim()) {
+			alert("Please enter both a color name and a hex code");
+			return;
+		}
+
+		setIsManualColorLoading(true);
+		try {
+			const response = await fetch("/api/database/add-colors", {
+				method: "POST",
+				headers: {
+					"Content-Type": "application/json",
+				},
+				body: JSON.stringify({
+					name: manualColorName,
+					hex: manualColorHex,
+				}),
+			});
+
+			const data = (await response.json()) as {
+				name?: string;
+				hex?: string;
+				error?: string;
+			};
+
+			if (!response.ok) {
+				throw new Error(data.error || "Failed to save color");
+			}
+
+			alert(`Saved color: ${data.name} (${data.hex})`);
+			setManualColorName("");
+			setManualColorHex("");
+		} catch (error) {
+			console.error("Error saving color:", error);
+			alert("Failed to save color");
+		} finally {
+			setIsManualColorLoading(false);
 		}
 	};
 
@@ -134,35 +177,58 @@ export default function AdminPage() {
 				<div className="flex flex-col items-center justify-center h-screen">
 					<h1 className="text-4xl font-bold mb-4">Admin Page</h1>
 					<div className="flex flex-col items-center space-y-10">
+						<div className="flex flex-col items-center gap-3">
+							<div className="text-lg font-semibold">Add Single Color</div>
+							<input
+								type="text"
+								placeholder="Color Name"
+								value={manualColorName}
+								onChange={(e) => setManualColorName(e.target.value)}
+								className="border border-gray-300 rounded px-2 py-1"
+							/>
+							<input
+								type="text"
+								placeholder="#RRGGBB"
+								value={manualColorHex}
+								onChange={(e) => setManualColorHex(e.target.value)}
+								className="border border-gray-300 rounded px-2 py-1"
+							/>
+							<button
+								className="bg-blue-300 rounded px-2 py-1 w-fit"
+								onClick={addSingleColor}
+								disabled={isManualColorLoading}
+							>
+								{isManualColorLoading ? "Saving..." : "Add Color"}
+							</button>
+						</div>
 						<button
 							className="bg-blue-300 rounded px-2 py-1 w-fit "
 							onClick={async () => {
 								fetchInitial(setTshirts, setPosters);
 								setIsSyncLoading(true);
 								for (const poster of posters) {
-									
 									const newPoster = {
 										...poster,
 										"Product Name": poster.title,
 										'11"x14" Price': poster.prices.find(
-											(price) => price.size === "11x14"
+											(price) => price.size === "11x14",
 										)?.price,
 										'12"x16" Price': poster.prices.find(
-											(price) => price.size === "12x16"
+											(price) => price.size === "12x16",
 										)?.price,
 										'16"x20" Price': poster.prices.find(
-											(price) => price.size === "16x20"
+											(price) => price.size === "16x20",
 										)?.price,
 										'20"x24" Price': poster.prices.find(
-											(price) => price.size === "20x24"
+											(price) => price.size === "20x24",
 										)?.price,
 										'18"x24" Price': poster.prices.find(
-											(price) => price.size === "18x24"
+											(price) => price.size === "18x24",
 										)?.price,
 										'24"x32" Price': poster.prices.find(
-											(price) => price.size === "24x32"
+											(price) => price.size === "24x32",
 										)?.price,
-									}
+									};
 									await fetch("/api/database/add-poster", {
 										method: "POST",
 										headers: {
@@ -178,24 +244,24 @@ export default function AdminPage() {
 										...tshirt,
 										"Product Name": tshirt.title,
 										"Small Price": tshirt.prices.find(
-											(price) => price.size === "Small"
+											(price) => price.size === "Small",
 										)?.price,
 										"Medium Price": tshirt.prices.find(
-											(price) => price.size === "Medium"
+											(price) => price.size === "Medium",
 										)?.price,
 										"Large Price": tshirt.prices.find(
-											(price) => price.size === "Large"
+											(price) => price.size === "Large",
 										)?.price,
 										"XL Price": tshirt.prices.find(
-											(price) => price.size === "XL"
+											(price) => price.size === "XL",
 										)?.price,
 										"2XL Price": tshirt.prices.find(
-											(price) => price.size === "2XL"
+											(price) => price.size === "2XL",
 										)?.price,
 										"3XL Price": tshirt.prices.find(
-											(price) => price.size === "3XL"
+											(price) => price.size === "3XL",
 										)?.price,
-									}
+									};
 									await fetch("/api/database/add-tshirt", {
 										method: "POST",
 										headers: {
@@ -227,7 +293,7 @@ export default function AdminPage() {
 									if (
 										!tableSplit[0].every(
 											(value: string, index: number) =>
-												value === tshirtHeader[index]
+												value === tshirtHeader[index],
 										)
 									) {
 										alert("Invalid Input File");
@@ -240,22 +306,22 @@ export default function AdminPage() {
 												id: tableSplit[i][0],
 												"Product Name": tableSplit[i][1],
 												"Small Price": parseFloat(
-													tableSplit[i][2].replace(/[$]/g, "")
+													tableSplit[i][2].replace(/[$]/g, ""),
 												),
 												"Medium Price": parseFloat(
-													tableSplit[i][3].replace(/[$]/g, "")
+													tableSplit[i][3].replace(/[$]/g, ""),
 												),
 												"Large Price": parseFloat(
-													tableSplit[i][4].replace(/[$]/g, "")
+													tableSplit[i][4].replace(/[$]/g, ""),
 												),
 												"XL Price": parseFloat(
-													tableSplit[i][5].replace(/[$]/g, "")
+													tableSplit[i][5].replace(/[$]/g, ""),
 												),
 												"2XL Price": parseFloat(
-													tableSplit[i][6].replace(/[$]/g, "")
+													tableSplit[i][6].replace(/[$]/g, ""),
 												),
 												"3XL Price": parseFloat(
-													tableSplit[i][7].replace(/[$]/g, "")
+													tableSplit[i][7].replace(/[$]/g, ""),
 												),
 											};
 											rows.push(row);
@@ -285,7 +351,7 @@ export default function AdminPage() {
 									if (
 										!tableSplit[0].every(
 											(value: string, index: number) =>
-												value === posterHeader[index]
+												value === posterHeader[index],
 										)
 									) {
 										alert("Invalid Input File");
@@ -298,22 +364,22 @@ export default function AdminPage() {
 												id: tableSplit[i][0],
 												"Product Name": tableSplit[i][1],
 												'11"x14" Price': parseFloat(
-													tableSplit[i][2].replace(/[$]/g, "")
+													tableSplit[i][2].replace(/[$]/g, ""),
 												),
 												'12"x16" Price': parseFloat(
-													tableSplit[i][3].replace(/[$]/g, "")
+													tableSplit[i][3].replace(/[$]/g, ""),
 												),
 												'16"x20" Price': parseFloat(
-													tableSplit[i][4].replace(/[$]/g, "")
+													tableSplit[i][4].replace(/[$]/g, ""),
 												),
 												'20"x24" Price': parseFloat(
-													tableSplit[i][5].replace(/[$]/g, "")
+													tableSplit[i][5].replace(/[$]/g, ""),
 												),
 												'18"x24" Price': parseFloat(
-													tableSplit[i][6].replace(/[$]/g, "")
+													tableSplit[i][6].replace(/[$]/g, ""),
 												),
 												'24"x32" Price': parseFloat(
-													tableSplit[i][7].replace(/[$]/g, "")
+													tableSplit[i][7].replace(/[$]/g, ""),
 												),
 											};
 											rows.push(row);
@@ -357,7 +423,7 @@ export default function AdminPage() {
 
 const fetchInitial = async (
 	setTshirts: (products: PrintifyProduct[]) => void,
-	setPosters: (products: PrintifyProduct[]) => void
+	setPosters: (products: PrintifyProduct[]) => void,
 ) => {
 	let posters: PrintifyProduct[] = [];
 	let shirts: PrintifyProduct[] = [];
