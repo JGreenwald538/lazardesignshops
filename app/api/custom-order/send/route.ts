@@ -23,7 +23,7 @@ export async function POST(req: NextRequest) {
 
       const { error } = await resend.emails.send({
         from: 'Lazar Designs <onboarding@resend.dev>',
-        to: 'lazardesigns11@gmail.com',
+        to: 'jackgreenwald4@gmail.com',
         subject: `New Custom Order: ${typeOfProject}`,
         replyTo: email,
         html: `

@@ -78,11 +78,11 @@ export default function Filter() {
 	const sortByType = searchParams.get("s");
 
 	return (
-		<div ref={filterRef} className="relative inline-block">
+		<div ref={filterRef} className="relative z-[1000] inline-block w-full sm:w-auto">
 			{shouldRender && (
 				<div
 					className={`
-						absolute left-0 right-0 translate-y-7 rounded-b-md flex flex-col 
+						absolute left-0 right-0 z-[1010] translate-y-3 overflow-hidden rounded-2xl border border-[#141110]/10 bg-white/95 shadow-2xl shadow-[#141110]/10 backdrop-blur-xl flex flex-col
 						transition-all duration-200
 						${
 							isAnimating
@@ -102,9 +102,9 @@ export default function Filter() {
 								<a
 									href={`/?f=${filterType}&s=${sort.param}${order}`}
 									key={index}
-									className={`block px-4 text-white text-center hover:brightness-90 transition-all ${
-										index % 2 === 0 ? "bg-[#F5615C]" : " bg-[#e35050]"
-									} last:rounded-b-md flex flex-row items-center justify-between`}
+									className={`flex flex-row items-center justify-between px-4 py-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#141110] transition-colors hover:bg-[#f4ece3] ${
+										index % 2 === 0 ? "bg-white" : "bg-[#f9f4ee]"
+									}`}
 								>
 									<div>{sort.title}</div>
 									{sortByType === sort.param + "desc" ? (
@@ -121,9 +121,9 @@ export default function Filter() {
 				</div>
 			)}
 			<button
-				className={`bg-[#e35050] text-white ${
-					clicked ? "rounded-t" : "rounded"
-				} px-4 text-xl font-semibold`}
+				className={`store-button w-full border border-[#141110]/10 bg-white/80 px-4 py-3 text-sm font-semibold uppercase tracking-[0.16em] text-[#141110] shadow-lg shadow-[#141110]/10 sm:px-5 sm:tracking-[0.2em] ${
+					clicked ? "rounded-t-2xl" : "rounded-full"
+				}`}
 				onClick={toggleMenu}
 			>
 				Sort By

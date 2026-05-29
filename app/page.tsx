@@ -122,8 +122,8 @@ function ProductsGrid() {
 
 	return (
 		<div
-			id="product-grid"
-			className="grid xl:grid-cols-3 lg:grid-cols-2 grid-cols-1 gap-8 w-full max-w-6xl px-4 items-center justify-center mb-6 mx-auto"
+			id="items"
+			className="mx-auto mb-6 grid w-full max-w-6xl grid-cols-1 items-center justify-center gap-5 px-4 sm:gap-8 lg:grid-cols-2 xl:grid-cols-3"
 			ref={itemsRef}
 		>
 			{isLoading ? (
@@ -139,6 +139,16 @@ function ProductsGrid() {
 						displayName={product.title.split("|")[0]}
 						productId={product.id}
 						imagePath={product.images[0] || "/placeholder.jpg"}
+						badgeLabel={product.product_type === "poster" ? "Poster" : "T-Shirt"}
+						priceLabel={
+								product.prices.some((price) => price.price !== null)
+									? `From $${Math.min(
+										...product.prices
+											.map((price) => price.price)
+											.filter((price): price is number => price !== null),
+									)}`
+								: "Price available on product page"
+						}
 					/>
 				))
 			)}
@@ -154,24 +164,45 @@ function ProductsWithSearch() {
 // Main page component
 export default function Home() {
 	return (
-		<div className="w-full max-w-full overflow-x-hidden flex flex-col justify-center items-center">
+		<div className="w-full max-w-full overflow-x-hidden flex flex-col items-center pb-16">
 			<TopBar />
 			<TickerComponent />
-			<div className="flex flex-row w-full max-w-4xl px-4 p-2 lg:my-4 my-0 rounded-xl justify-between">
-				<Filter />
-				<SortBy />
-			</div>
-			<div className="flex lg:flex-row flex-col p-2 lg:my-4 my-0 rounded-xl justify-center gap-x-72 gap-y-4 w-full">
-				<PopularItem
-					displayName="Posters"
-					imagePath="/chromaposter mock.png"
-					filterType="posters"
-				/>
-				<PopularItem
-					displayName="T-Shirts"
-					imagePath="/passionshirt mock.png"
-					filterType="tshirts"
-				/>
+			<section className="mx-auto w-full max-w-7xl px-4 py-6 lg:py-12">
+				<div className="glass-panel rounded-3xl p-4 sm:rounded-4xl sm:p-5">
+					<div className="text-[11px] uppercase tracking-[0.28em] text-[#7a716a] sm:text-xs sm:tracking-[0.35em]">
+						What sells
+					</div>
+					<div className="mt-2 text-2xl font-semibold leading-tight text-[#141110] sm:text-3xl">
+						Best-selling formats
+					</div>
+					<div className="mt-4 grid grid-cols-1 gap-4 md:grid-cols-2">
+						<PopularItem
+							displayName="Posters"
+							imagePath="/chromaposter mock.png"
+							filterType="posters"
+						/>
+						<PopularItem
+							displayName="T-Shirts"
+							imagePath="/passionshirt mock.png"
+							filterType="tshirts"
+						/>
+					</div>
+				</div>
+			</section>
+
+			<div className="glass-panel relative z-[900] mx-auto mb-5 flex w-[calc(100%-2rem)] max-w-7xl flex-col items-stretch justify-between gap-4 rounded-3xl px-4 py-4 sm:w-full sm:flex-row sm:flex-wrap sm:items-center sm:px-6">
+				<div>
+					<div className="text-[11px] uppercase tracking-[0.28em] text-[#7a716a] sm:text-xs sm:tracking-[0.35em]">
+						Shop catalog
+					</div>
+					<div className="text-2xl font-semibold leading-tight text-[#141110] sm:text-3xl">
+						Find the piece that fits
+					</div>
+				</div>
+				<div className="grid grid-cols-2 gap-3 sm:flex sm:flex-wrap">
+					<Filter />
+					<SortBy />
+				</div>
 			</div>
 			<Suspense fallback={<div className="text-center py-8">Loading...</div>}>
 				<ProductsWithSearch />

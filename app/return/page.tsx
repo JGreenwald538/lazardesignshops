@@ -24,7 +24,9 @@ export default async function Return({
 	});
 
 	const { status, customer_details } = session;
-	const customerEmail = customer_details?.email || "unknown";
+	const shippingMetadata = session.metadata || {};
+	const customerEmail =
+		shippingMetadata.shipping_email || customer_details?.email || "unknown";
 
 	if (status === "complete") {
 		const cart = await GetCart();
@@ -41,23 +43,45 @@ export default async function Return({
 		const firstName = customer_details?.name?.split(" ")[0] || "";
 		const lastName =
 			customer_details?.name?.split(" ").slice(1).join(" ") || "";
+		const shippingFirstName = shippingMetadata.shipping_first_name || firstName;
+		const shippingLastName = shippingMetadata.shipping_last_name || lastName;
+		const shippingMethod = Number(shippingMetadata.printify_shipping_method) || 1;
 
 		const order = {
 			external_id: session_id,
 			line_items: lineItems,
-			shipping_method: 1,
+			shipping_method: shippingMethod,
 			send_shipping_notification: true,
 			address_to: {
-				first_name: firstName,
-				last_name: lastName,
+				first_name: shippingFirstName,
+				last_name: shippingLastName,
 				email: customerEmail,
-				phone: customer_details?.phone || "",
-				country: customer_details?.address?.country || "",
-				region: customer_details?.address?.state || "",
-				address1: customer_details?.address?.line1 || "",
-				address2: customer_details?.address?.line2 || "",
-				city: customer_details?.address?.city || "",
-				zip: customer_details?.address?.postal_code || "",
+				phone:
+					shippingMetadata.shipping_phone || customer_details?.phone || "",
+				country:
+					shippingMetadata.shipping_country ||
+					customer_details?.address?.country ||
+					"",
+				region:
+					shippingMetadata.shipping_region ||
+					customer_details?.address?.state ||
+					"",
+				address1:
+					shippingMetadata.shipping_address1 ||
+					customer_details?.address?.line1 ||
+					"",
+				address2:
+					shippingMetadata.shipping_address2 ||
+					customer_details?.address?.line2 ||
+					"",
+				city:
+					shippingMetadata.shipping_city ||
+					customer_details?.address?.city ||
+					"",
+				zip:
+					shippingMetadata.shipping_zip ||
+					customer_details?.address?.postal_code ||
+					"",
 			},
 		};
 

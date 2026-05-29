@@ -2,12 +2,68 @@
 @config "../tailwind.config.ts";
 
 :root {
-  --background: #fcf5ee;
-  --foreground: #171717;
+  --background: #d15b43;
+  --foreground: #141110;
+  --panel: rgba(255, 251, 244, 0.78);
+  --panel-border: rgba(20, 17, 16, 0.12);
+  --accent: #d15b43;
+  --accent-strong: #0f2340;
+  --accent-light: #d64b2f;
+}
+
+html {
+  scroll-behavior: smooth;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Montserrat, Arial, Helvetica, sans-serif;
+  font-family: var(--font-montserrat), Arial, Helvetica, sans-serif;
+  min-height: 100vh;
+  background-image:
+    radial-gradient(circle at top left, rgba(209, 91, 67, 0.16), transparent 34%),
+    radial-gradient(circle at top right, rgba(15, 35, 64, 0.14), transparent 30%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.35), rgba(247, 239, 228, 0.9));
+  background-attachment: fixed;
+}
+
+::selection {
+  background: rgba(209, 91, 67, 0.2);
+  color: #141110;
+}
+
+.glass-panel {
+  background: var(--panel);
+  border: 1px solid var(--panel-border);
+  box-shadow: 0 20px 60px rgba(20, 17, 16, 0.08);
+  backdrop-filter: blur(18px);
+}
+
+.store-button {
+  transition: transform 180ms ease, box-shadow 180ms ease, background-color 180ms ease;
+}
+
+.store-button:hover {
+  transform: translateY(-1px);
+}
+
+.store-button:active {
+  transform: translateY(0);
+}
+
+.product-description-preview {
+  max-height: calc(1.625rem * 6);
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - 1.625rem),
+    rgba(0, 0, 0, 0.28) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 0,
+    #000 calc(100% - 1.625rem),
+    rgba(0, 0, 0, 0.28) 100%
+  );
 }

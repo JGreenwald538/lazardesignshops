@@ -29,11 +29,9 @@ export default function DropDown({
 	}, []);
 
 	return (
-		<div ref={dropdownRef} className="relative">
-			{" "}
-			{/* Added relative positioning here */}
+		<div ref={dropdownRef} className="relative z-20">
 			<button
-				className="border-2 border-black rounded px-2 text-xl"
+				className="store-button rounded-full border border-[#141110]/10 bg-[#141110] px-5 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[#141110]/15"
 				onClick={() => {
 					setClicked(!clicked);
 				}}
@@ -41,14 +39,14 @@ export default function DropDown({
 				{displayName}
 			</button>
 			{clicked && (
-				<div className="bg-white absolute left-0 rounded-md border-2 border-black flex flex-col z-20">
+				<div className="absolute left-0 z-30 mt-2 flex min-w-max flex-col overflow-hidden rounded-2xl border border-[#141110]/10 bg-white shadow-2xl shadow-[#141110]/10">
 					{displayList.map((dropdown: string, index: number) => (
 						<button
 							key={index.toString()}
-							className="px-1 last:border-b-0 border-b-2 border-black text-lg whitespace-nowrap"
+							className="whitespace-nowrap border-b border-[#141110]/10 px-4 py-3 text-left text-sm font-semibold uppercase tracking-[0.15em] text-[#141110] last:border-b-0 hover:bg-[#f4ece3]"
 							onClick={() => {
 								setType(dropdown);
-								setClicked(false); // Close dropdown after selection
+								setClicked(false);
 							}}
 						>
 							{dropdown}

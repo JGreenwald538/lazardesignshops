@@ -4,16 +4,66 @@ import { headers } from "next/headers";
 import type Stripe from "stripe";
 import { stripe } from "./Stripe";
 import { GetCart, GetCartTotal } from "./Cart";
+import {
+	calculatePrintifyShippingAmount,
+	calculatePrintifyShippingOptions,
+	getPrintifyShippingMethod,
+	normalizeShippingAddress,
+	type PrintifyShippingOptionId,
+	type ShippingAddress,
+} from "./PrintifyShipping";
 
-export async function fetchClientSecret() {
+export async function fetchShippingOptions(shippingAddress: ShippingAddress) {
+	const cart = await GetCart();
+
+	if (!cart || !Array.isArray(cart) || cart.length === 0) {
+		throw new Error("Cart is empty or invalid");
+	}
+
+	const cartTotal = await GetCartTotal();
+	const rawOptions = await calculatePrintifyShippingOptions(cart, shippingAddress);
+	const standardDiscount =
+		cartTotal >= 35
+			? rawOptions.find((option) => option.id === "standard")?.amount || 0
+			: 0;
+
+	return rawOptions.map((option) => ({
+		...option,
+		amount: Math.max(0, option.amount - standardDiscount),
+	}));
+}
+
+export async function fetchClientSecret(
+	shippingAddress: ShippingAddress,
+	shippingOptionId: PrintifyShippingOptionId,
+) {
 	try {
 		const origin = (await headers()).get("origin");
 		const cart = await GetCart();
+		const normalizedShippingAddress = normalizeShippingAddress(shippingAddress);
 
 		// Validate cart data
 		if (!cart || !Array.isArray(cart) || cart.length === 0) {
 			throw new Error("Cart is empty or invalid");
 		}
+
+		const cartTotal = await GetCartTotal();
+		const rawOptions = await calculatePrintifyShippingOptions(
+			cart,
+			normalizedShippingAddress,
+		);
+		const standardDiscount =
+			cartTotal >= 35
+				? rawOptions.find((option) => option.id === "standard")?.amount || 0
+				: 0;
+		const printifyShippingAmount = await calculatePrintifyShippingAmount(
+			cart,
+			normalizedShippingAddress,
+			shippingOptionId,
+			standardDiscount,
+		);
+		const selectedShippingMethod =
+			getPrintifyShippingMethod(shippingOptionId).toString();
 
 		// Create an array of line items after validating each cart item
 		const lineItems = [];
@@ -72,12 +122,12 @@ export async function fetchClientSecret() {
 			throw new Error("No valid items could be processed");
 		}
 
-		if (await GetCartTotal() < 35) {
+		if (printifyShippingAmount > 0) {
 			const shippingPrice = await stripe.prices.create({
 				product_data: {
 					name: "Shipping Fee",
 				},
-				unit_amount: 500, // Flat rate of $5.00
+				unit_amount: printifyShippingAmount,
 				currency: "USD",
 			})
 			lineItems.push({
@@ -92,10 +142,26 @@ export async function fetchClientSecret() {
 			line_items: lineItems,
 			mode: "payment",
 			return_url: `${origin}/return?session_id={CHECKOUT_SESSION_ID}`,
-			shipping_address_collection: {
-				allowed_countries: ["US"],
-			},
 			billing_address_collection: "required", // Collect full billing address
+			customer_email: normalizedShippingAddress.email,
+			phone_number_collection: {
+				enabled: true,
+			},
+			metadata: {
+				shipping_first_name: normalizedShippingAddress.firstName,
+				shipping_last_name: normalizedShippingAddress.lastName,
+				shipping_email: normalizedShippingAddress.email,
+				shipping_phone: normalizedShippingAddress.phone || "",
+				shipping_country: normalizedShippingAddress.country,
+				shipping_region: normalizedShippingAddress.region,
+				shipping_address1: normalizedShippingAddress.address1,
+				shipping_address2: normalizedShippingAddress.address2 || "",
+				shipping_city: normalizedShippingAddress.city,
+				shipping_zip: normalizedShippingAddress.zip,
+				printify_shipping_cents: printifyShippingAmount.toString(),
+				printify_shipping_option: shippingOptionId,
+				printify_shipping_method: selectedShippingMethod,
+			},
 		};
 		const session = await stripe.checkout.sessions.create(sessionParams);
 

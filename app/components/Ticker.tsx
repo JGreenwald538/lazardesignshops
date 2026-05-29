@@ -1,24 +1,19 @@
 import React from "react";
-import Marquee from "react-fast-marquee";
 
-const messages = [
-	"$35+ FREE SHIPPING",
-];
+const messages = Array.from({ length: 8 }, () => "$35 FREE SHIPPING");
 
 const TickerComponent = () => {
 	return (
-		<div className="flex justify-center w-full overflow-hidden text-white py-2 bg-[#206DCC] mt-4">
-			<div className="max-w-full w-full">
-				<Marquee speed={50} gradient={false} loop={0} autoFill>
-					{messages.map((msg, index) => (
-						<span
-							key={index}
-							className="text-lg font-bold mx-10 whitespace-nowrap select-none"
-						>
-							{msg}
-						</span>
-					))}
-				</Marquee>
+		<div className="mt-4 flex w-full justify-center overflow-hidden border-y border-[#141110]/10 bg-[#141110] py-3 text-white shadow-[0_18px_40px_rgba(20,17,16,0.12)]">
+			<div className="flex w-full items-center justify-start gap-10 overflow-hidden pl-4">
+				{messages.map((msg, index) => (
+					<span
+						key={index}
+						className="shrink-0 select-none whitespace-nowrap text-sm font-semibold uppercase tracking-[0.32em] text-white/90 sm:tracking-[0.35em]"
+					>
+						{msg}
+					</span>
+				))}
 			</div>
 		</div>
 	);

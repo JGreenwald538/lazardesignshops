@@ -10,67 +10,78 @@ export default function TopBar() {
 	const [cartNumber, setCartNumber] = useState(0);
 
 	useEffect(() => {
-		NumberInCart().then((number) => setCartNumber(number));
-	});
+		let isMounted = true;
+		NumberInCart().then((number) => {
+			if (isMounted) {
+				setCartNumber(number);
+			}
+		});
+
+		return () => {
+			isMounted = false;
+		};
+	}, []);
 	return (
-		<div className="lg:px-24 px-10 pt-8 w-full flex lg:flex-row flex-col justify-between items-center lg:space-y-0 space-y-5 z-50">
-			<Link
-				href={"/"}
-				className="object-scale-down lg:w-[12%] w-1/2 justify-start mr-4"
-			>
-				<Image
-					src="/Lazar.Wide.white.png"
-					alt=""
-					width={4574}
-					height={2092}
-					className=""
-				/>
-			</Link>
-			<div className="lg:w-full lg:px-0 px-5 rounded flex lg:flex-row flex-col py-5 items-center lg:gap-y-0 gap-y-5">
-				<div className="flex-1 lg:flex justify-self-start gap-x-5 lg:ml-5 lg:flex-row lg:gap-y-0 gap-y-3 grid grid-cols-2">
-					<a
-						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 whitespace-pre text-center"
-						href={"/?f=posters"}
+		<div className="sticky top-0 z-50 w-full px-3 pt-3 sm:px-6 lg:px-8">
+			<div className="glass-panel mx-auto grid w-full max-w-7xl grid-cols-[1fr_auto] items-center gap-3 rounded-3xl px-3 py-3 sm:px-4 lg:flex lg:rounded-[2rem] lg:px-6 lg:py-4">
+				<Link href="/" className="flex min-w-0 items-center">
+					<div className="flex h-12 w-44 max-w-full items-center justify-center px-1 sm:h-14 sm:w-54">
+						<Image
+							src="/LazarD.PlainBlack.png"
+							alt="LazarDesigns"
+							width={4574}
+							height={2092}
+							className="h-auto w-full object-contain"
+						/>
+					</div>
+				</Link>
+
+				<div className="order-3 col-span-2 grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3 lg:order-none lg:flex-1 lg:justify-center lg:px-6">
+					<Link
+						className="store-button rounded-full border border-[#141110]/10 bg-white/70 px-3 py-2 text-center text-xs font-semibold tracking-wide text-[#141110] shadow-sm hover:border-[#d15b43]/35 hover:bg-white sm:px-5 sm:text-sm"
+						href="/?f=posters"
 					>
-						{"Posters"}
-					</a>
-					<a
-						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center text-nowrap"
-						href={"/?f=tshirts"}
+						Posters
+					</Link>
+					<Link
+						className="store-button rounded-full border border-[#141110]/10 bg-white/70 px-3 py-2 text-center text-xs font-semibold tracking-wide text-[#141110] shadow-sm hover:border-[#d15b43]/35 hover:bg-white sm:px-5 sm:text-sm"
+						href="/?f=tshirts"
 					>
 						T-Shirts
-					</a>
-					<a className="text-xl bg-[#e35050] text-white rounded px-4 py-1 whitespace-pre text-center">
-						{" Other "}
-					</a>
+					</Link>
 					<Link
-						className="text-xl bg-[#e35050] text-white rounded px-5 py-1 text-center lg:hidden"
-						href={"/contact"}
+						className="store-button rounded-full border border-[#141110]/10 bg-white/70 px-3 py-2 text-center text-xs font-semibold tracking-wide text-[#141110] shadow-sm hover:border-[#d15b43]/35 hover:bg-white sm:px-5 sm:text-sm"
+						href="/customorder"
+					>
+						Custom Order
+					</Link>
+					<Link
+						className="store-button rounded-full border border-[#141110]/10 bg-white/70 px-3 py-2 text-center text-xs font-semibold tracking-wide text-[#141110] shadow-sm hover:border-[#d15b43]/35 hover:bg-white sm:px-5 sm:text-sm"
+						href="/contact"
 					>
 						Contact
 					</Link>
 				</div>
-				{/* <input placeholder="Search for products" type="text" name="text" className="flex-1 p-2 rounded-md border-[1.5px] border-gray-200 mr-5 active:border-gray-400 "></input> */}
-				<div className="flex lg:space-x-4 lg:mr-5 justify-self-end h-fit lg:flex-row flex-col items-center lg:gap-y-0 gap-y-3">
+
+				<div className="flex items-center gap-3 justify-self-end lg:self-auto">
+					<div className="hidden text-right lg:block">
+						<div className="text-xs uppercase tracking-[0.3em] text-[#6a625d]">
+							Ready to ship
+						</div>
+						<div className="text-sm font-semibold text-[#141110]">
+							$35+ free shipping
+						</div>
+					</div>
 					<Link
-						className="text-xl bg-[#e35050] text-white rounded px-5 py-1 text-center lg:block hidden"
-						href={"/contact"}
+						className="store-button relative inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#141110] text-white shadow-lg shadow-[#141110]/20 hover:bg-accent_light hover:text-foreground sm:h-12 sm:w-12"
+						href="/checkout/review"
 					>
-						Contact
-					</Link>
-					<Link
-						className="text-xl bg-[#e35050] text-white rounded px-3 py-1 text-center text-nowrap"
-						href={"/customorder"}
-					>
-						Custom Order
-					</Link>
-					<Link href={"/checkout/review"}>
 						{cartNumber !== 0 && (
-							<div className="absolute rounded-full bg-white w-5 h-5 text-center translate-x-6 -translate-y-2 text-sm">
+							<div className="absolute -right-1 -top-1 flex h-5 min-w-5 items-center justify-center rounded-full bg-[#d15b43] px-1 text-xs font-bold text-white">
 								{cartNumber}
 							</div>
 						)}
-						<FaShoppingCart className="text-4xl text-black py-1" />
+						<FaShoppingCart className="text-lg" />
 					</Link>
 				</div>
 			</div>

@@ -1,17 +1,17 @@
 "use client";
 
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
+import { BiSolidDownArrow, BiSolidUpArrow } from "react-icons/bi";
 import DropDown from "@/app/components/Dropdown";
-import { BiSolidUpArrow, BiSolidDownArrow } from "react-icons/bi";
 import TopBar from "@/app/components/TopBar";
+import { AddToCart } from "@/app/utils/Cart";
 import {
 	isValidPrintifyProduct,
 	PrintifyProduct,
 } from "@/app/utils/PrintifyProduct";
-import { AddToCart } from "@/app/utils/Cart";
-import Link from "next/link";
 
 type ColorRecord = {
 	name: string;
@@ -21,15 +21,18 @@ type ColorRecord = {
 export default function ProductPage() {
 	const { id } = useParams();
 	const [product, setProduct] = useState<PrintifyProduct | null>(null);
-	const [loading, setLoading] = useState<boolean>(true);
+	const [loading, setLoading] = useState(true);
 	const [error, setError] = useState<string | null>(null);
-	const [quantity, setQuantity] = useState<number>(1);
-	const [selectedImageIndex, setSelectedImageIndex] = useState<number>(0);
+	const [quantity, setQuantity] = useState(1);
+	const [selectedImageIndex, setSelectedImageIndex] = useState(0);
 	const [size, setSize] = useState("");
 	const [color, setColor] = useState("");
 	const [variantID, setVariantID] = useState(0);
 	const [addToCartPressed, setAddToCartPressed] = useState(false);
 	const [colorMap, setColorMap] = useState<Record<string, string>>({});
+	const [descriptionExpanded, setDescriptionExpanded] = useState(false);
+	const [descriptionCanExpand, setDescriptionCanExpand] = useState(false);
+	const descriptionRef = useRef<HTMLDivElement>(null);
 
 	const resolveVariantID = useCallback(
 		async (
@@ -53,9 +56,7 @@ export default function ProductPage() {
 				body: JSON.stringify({
 					size: selectedSize,
 					id,
-					...(product.product_type === "tshirt"
-						? { color: selectedColor }
-						: {}),
+					...(product.product_type === "tshirt" ? { color: selectedColor } : {}),
 				}),
 			});
 
@@ -97,9 +98,10 @@ export default function ProductPage() {
 					return;
 				}
 				if (!isValidPrintifyProduct(data)) console.error("Data is not valid");
+				setDescriptionExpanded(false);
 				setProduct(data);
 				if (data?.colors?.length === 1) {
-					setColor(data?.colors[0]);
+					setColor(data.colors[0]);
 				}
 				setLoading(false);
 			})
@@ -111,20 +113,38 @@ export default function ProductPage() {
 	}, [id]);
 
 	useEffect(() => {
+		const descriptionElement = descriptionRef.current;
+		if (!descriptionElement || !product?.description) {
+			requestAnimationFrame(() => setDescriptionCanExpand(false));
+			return;
+		}
+
+		if (descriptionExpanded) return;
+
+		const animationFrame = requestAnimationFrame(() => {
+			setDescriptionCanExpand(
+				descriptionElement.scrollHeight > descriptionElement.clientHeight + 1,
+			);
+		});
+
+		return () => cancelAnimationFrame(animationFrame);
+	}, [product?.description, descriptionExpanded]);
+
+	useEffect(() => {
 		fetch("/api/database/colors")
 			.then((res) => res.json())
 			.then((data: ColorRecord[] | { error?: string }) => {
 				if (Array.isArray(data)) {
 					setColorMap(
-						data.reduce<Record<string, string>>((accumulator, color) => {
-							accumulator[color.name] = color.hex;
+						data.reduce<Record<string, string>>((accumulator, colorItem) => {
+							accumulator[colorItem.name] = colorItem.hex;
 							return accumulator;
 						}, {}),
 					);
 				}
 			})
-			.catch((error) => {
-				console.error("Failed to fetch colors:", error);
+			.catch((fetchError) => {
+				console.error("Failed to fetch colors:", fetchError);
 			});
 	}, []);
 
@@ -179,9 +199,7 @@ export default function ProductPage() {
 		const response = await AddToCart(
 			resolvedVariantID,
 			quantity,
-			product.prices.find((price) => {
-				return price.size === size;
-			})?.price || 0,
+			product.prices.find((price) => price.size === size)?.price || 0,
 			product.title,
 			product.id,
 			images,
@@ -191,169 +209,214 @@ export default function ProductPage() {
 		}
 	};
 
-	console.log(product?.colors);
+	if (loading) {
+		return (
+			<div className="flex min-h-screen flex-col overflow-x-hidden">
+				<TopBar />
+				<div className="mx-auto flex w-full max-w-7xl grow items-center justify-center px-4 py-8">
+					<p>Loading product...</p>
+				</div>
+			</div>
+		);
+	}
 
 	return (
-		<div className="flex flex-col overflow-x-hidden h-screen">
-			{/* Fixed position TopBar with higher z-index */}
+		<div className="flex min-h-screen flex-col overflow-x-hidden pb-10">
 			<TopBar />
-
-			{/* Main content with proper spacing from TopBar */}
-			<div className="grow flex items-center justify-center w-full pt-4">
-				{loading && <p>Loading product...</p>}
-				{error && <p style={{ color: "red" }}>{error}</p>}
+			<div className="mx-auto flex w-full max-w-7xl grow items-center justify-center px-4 pb-8 pt-6 lg:px-6">
+				{error && <p className="text-[#b04a37]">{error}</p>}
 				{product && (
-					<div className="flex md:flex-row flex-col items-center justify-center w-full">
+					<div className="glass-panel grid w-full gap-8 rounded-[2.5rem] p-5 md:grid-cols-[minmax(18rem,0.9fr)_minmax(0,1.1fr)] md:p-8 lg:p-10">
 						{product.images && product.images.length > 0 && (
-							<div className="md:w-2/5 w-full max-w-md flex flex-col items-center gap-4 md:mb-0 z-10">
-								{/* Main Image Display */}
-								<div className="w-full relative">
+							<div className="flex w-full min-w-0 flex-col gap-4 md:min-w-[18rem]">
+								<div className="relative aspect-square w-full overflow-hidden rounded-4xl bg-[#f6efe6]">
 									<Image
 										src={product.images[selectedImageIndex]}
 										alt={`${product.title} - view ${selectedImageIndex + 1}`}
-										width={4000}
-										height={4000}
-										className="object-contain w-full h-auto"
+										fill
+										sizes="(min-width: 1024px) 42vw, (min-width: 768px) 45vw, 100vw"
+										className="object-contain p-3 sm:p-4"
 										priority
 									/>
 								</div>
 
-								{/* Thumbnail Gallery */}
-								<div className="flex flex-row flex-wrap gap-2 justify-center">
+								<div className="flex flex-wrap justify-center gap-2">
 									{product.images.map((image, index) => (
-										<div
+										<button
 											key={index}
-											className={`cursor-pointer relative transition-all ${
+											type="button"
+											className={`overflow-hidden rounded-2xl border-2 bg-white transition ${
 												selectedImageIndex === index
-													? "border-black"
-													: "border-gray-200"
+													? "border-[#141110]"
+													: "border-[#141110]/10 opacity-80 hover:opacity-100"
 											}`}
 											onClick={() => setSelectedImageIndex(index)}
 										>
 											<Image
 												src={image}
 												alt={`${product.title} thumbnail ${index + 1}`}
-												width={80}
-												height={80}
-												priority
-												className="object-cover w-16 h-16"
+												width={96}
+												height={96}
+												className="h-14 w-14 object-contain p-1 sm:h-16 sm:w-16"
 												unoptimized
 											/>
-										</div>
+										</button>
 									))}
 								</div>
 							</div>
 						)}
 
-						<div className="flex flex-col justify-center md:w-1/2 w-full md:pl-8 gap-y-6 md:px-0 px-4 py-2">
-							<h1 className="text-3xl md:text-4xl font-bold text-left w-full wrap-break-word">
-								{product.title}
-							</h1>
-							{product.description ? (
-								<div className="w-full">
-									{product.description
-										.split(".:")
-										.map((text: string, index: number) => (
-											<p
-												key={index.toString()}
-												className="text-start w-full wrap-break-word mb-2"
-											>
-												{text.trim()}
-											</p>
-										))}
+						<div className="flex min-w-0 flex-col justify-center gap-6 rounded-4xl bg-white/55 p-4 sm:p-6 lg:p-8">
+							<div>
+								<div className="mb-3 inline-flex rounded-full border border-[#141110]/10 bg-[#141110] px-4 py-2 text-xs font-semibold uppercase tracking-[0.3em] text-white">
+									{product.product_type === "poster" ? "Poster" : "T-Shirt"}
 								</div>
-							) : (
-								<p className="text-start w-full">No description available</p>
-							)}
+								<h1 className="display-font w-full text-4xl leading-tight text-[#141110] md:text-6xl">
+									{product.title}
+								</h1>
+							</div>
 
-							<div className="flex flex-row items-center space-x-5">
+							<div>
+								{product.description ? (
+									<>
+										<div
+											ref={descriptionRef}
+											className={`space-y-3 text-[#5f5650] leading-relaxed ${
+												descriptionExpanded
+													? ""
+													: "product-description-preview"
+											}`}
+										>
+											{product.description
+												.split(".: ")
+												.map((text: string, index: number) => (
+													<p
+														key={index.toString()}
+														className="w-full wrap-break-word"
+													>
+														{text.trim()}
+													</p>
+												))}
+										</div>
+										{descriptionCanExpand && (
+											<button
+												type="button"
+												className="mt-3 text-sm font-semibold uppercase tracking-[0.18em] text-[#d15b43] transition hover:text-[#141110]"
+												onClick={() =>
+													setDescriptionExpanded((current) => !current)
+												}
+											>
+												{descriptionExpanded ? "Show less" : "Show more"}
+											</button>
+										)}
+									</>
+								) : (
+									<p className="text-[#5f5650]">No description available</p>
+								)}
+							</div>
+
+							<div className="flex flex-wrap items-center gap-3">
 								<DropDown
 									displayList={product.prices
-										.filter((price) => price.price)
+										.filter((price) => price.price !== null)
 										.map((price) => price.size)}
-									displayName={size || "Sizes"}
+									displayName={size || "Select size"}
 									setType={setSize}
 								/>
-								{color && <div className="text-xl">{color}</div>}
+								{color && (
+									<div className="rounded-full border border-[#141110]/10 bg-white px-4 py-2 text-sm font-semibold text-[#141110]">
+										{color}
+									</div>
+								)}
 							</div>
 
 							{product.colors && product.colors.length !== 0 && (
-								<div className="items-center justify-center w-fit py-2 px-2 flex flex-row space-x-4 h-7">
+								<div className="flex flex-wrap gap-3">
 									{product.colors.map((buttonColor, index) => {
-										if (buttonColor in colorMap)
+										if (buttonColor in colorMap) {
 											return (
-												<div
-													className="border-black rounded-full h-7 w-7 flex items-center"
-													style={{
-														borderWidth: color === buttonColor ? "2px" : 0,
-													}}
+												<button
 													key={index}
+													type="button"
+													className={`rounded-full border p-1 transition duration-200 hover:scale-110 hover:border-[#d15b43] hover:shadow-[0_0_0_3px_rgba(209,91,67,0.2)] ${
+														color === buttonColor
+															? "scale-110 border-[#d15b43] shadow-[0_0_0_3px_rgba(209,91,67,0.2)]"
+															: "border-[#141110]/20"
+													}`}
+													onClick={() => setColor(buttonColor)}
+													aria-label={buttonColor}
+													aria-pressed={color === buttonColor}
 												>
-													<button
-														className="rounded-full w-6 h-6 border-2 border-gray-300"
-														style={{
-															backgroundColor: colorMap[buttonColor],
-														}}
-														onClick={() => setColor(buttonColor)}
+													<span
+														className="block h-7 w-7 rounded-full border border-white/70"
+														style={{ backgroundColor: colorMap[buttonColor] }}
 													/>
-												</div>
+												</button>
 											);
+										}
+										return null;
 									})}
 								</div>
 							)}
 
-							<div className="text-xl">
-								{"Price: " +
-									(product.prices.find((price) => {
-										return price.size === size;
-									})
-										? "$" +
-											product.prices.find((price) => {
-												return price.size === size;
-											})?.price
-										: "Select Size to find Price")}
+							<div className="rounded-3xl border border-[#141110]/10 bg-white px-5 py-4 shadow-[0_8px_20px_rgba(20,17,16,0.06)]">
+								<div className="text-xs font-semibold uppercase tracking-[0.3em] text-[#7a716a]">PRICE</div>
+								<div className="mt-1 text-4xl font-bold text-[#141110]">
+									{product.prices.find((price) => price.size === size)
+										? `$${product.prices.find((price) => price.size === size)?.price}`
+										: "Select a size"}
+								</div>
+								<div className="mt-1 text-sm font-medium text-[#5f5650]">
+									Estimated shipping time: 3-5 days
+								</div>
 							</div>
 
-							<div className="flex flex-row gap-x-2 items-center">
-								<div className="text-xl">Quantity: </div>
-								<textarea
-									className="border-2 border-black rounded-md p-1 w-10 text-center overflow-hidden resize-none"
-									value={quantity}
-									onChange={(e) => {
-										const val = e.target.value;
-										if (val === "" || parseInt(val) < 0) {
-											setQuantity(0);
-											return;
-										}
-										if (isNaN(parseInt(val)) || parseInt(val) > 9) return;
-										setQuantity(parseInt(val));
-									}}
-									rows={1}
-									cols={1}
-								/>
-								<div className="flex flex-col">
-									<button
-										onClick={() => {
+							<div className="flex items-center gap-3">
+								<div className="text-sm font-semibold uppercase tracking-[0.28em] text-[#7a716a]">
+									Quantity
+								</div>
+								<div className="flex items-center gap-2 rounded-full border border-[#141110]/10 bg-white px-3 py-2">
+									<textarea
+										className="h-9 w-10 resize-none bg-transparent text-center text-lg font-semibold text-[#141110] outline-none"
+										value={quantity}
+										onChange={(e) => {
+											const val = e.target.value;
+											if (val === "" || parseInt(val) < 0) {
+												setQuantity(0);
+												return;
+											}
+											if (isNaN(parseInt(val)) || parseInt(val) > 9) return;
+											setQuantity(parseInt(val));
+										}}
+										rows={1}
+										cols={1}
+									/>
+									<div className="flex flex-col text-[#7a716a]">
+										<button
+											type="button"
+											onClick={() => {
 											if (quantity == 9) return;
 											setQuantity((prev) => prev + 1);
 										}}
-									>
-										<BiSolidUpArrow />
-									</button>
-									<button
-										onClick={() => {
+										>
+											<BiSolidUpArrow />
+										</button>
+										<button
+											type="button"
+											onClick={() => {
 											if (quantity == 1) return;
 											setQuantity((prev) => prev - 1);
 										}}
-									>
-										<BiSolidDownArrow />
-									</button>
+										>
+											<BiSolidDownArrow />
+										</button>
+									</div>
 								</div>
 							</div>
-							<div className="text-xl">Estimated Shipping Time: 3-5 days</div>
-							<div className="flex flex-row gap-x-4">
+
+							<div className="flex flex-wrap gap-3">
 								<button
-									className="bg-black text-white py-2 rounded-md w-32"
+									className="store-button rounded-full bg-[#141110] px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-white shadow-lg shadow-[#141110]/15"
 									onClick={async () => {
 										await handleAddToCart([product.images[0]]);
 									}}
@@ -361,11 +424,11 @@ export default function ProductPage() {
 									{addToCartPressed ? "Added!" : "Add to Cart"}
 								</button>
 								<Link
-									className="bg-black text-white px-4 py-2 rounded-md"
+									className="store-button rounded-full border border-[#141110]/10 bg-white/80 px-6 py-3 text-sm font-semibold uppercase tracking-[0.2em] text-[#141110]"
 									onClick={async () => {
 										await handleAddToCart(product.images);
 									}}
-									href={"/checkout/review"}
+									href="/checkout/review"
 								>
 									Buy Now
 								</Link>
