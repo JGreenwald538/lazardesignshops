@@ -18,6 +18,29 @@ type ColorRecord = {
 	hex: string;
 };
 
+type ShippingEstimateState = {
+	estimate: string;
+	location: string;
+	isLocationBased: boolean;
+	productType: string;
+	size: string;
+};
+
+function getFallbackShippingEstimate(product: PrintifyProduct, selectedSize: string) {
+	const isLargePoster =
+		product.product_type === "poster" &&
+		["18x24", "20x24", "24x32"].includes(selectedSize);
+	const isExtendedTshirt =
+		product.product_type === "tshirt" && ["2XL", "3XL"].includes(selectedSize);
+	const extraDay = isLargePoster || isExtendedTshirt ? 1 : 0;
+
+	if (product.product_type === "poster") {
+		return `${4 + extraDay}-${7 + extraDay} business days`;
+	}
+
+	return `${5 + extraDay}-${8 + extraDay} business days`;
+}
+
 export default function ProductPage() {
 	const { id } = useParams();
 	const [product, setProduct] = useState<PrintifyProduct | null>(null);
@@ -32,6 +55,8 @@ export default function ProductPage() {
 	const [colorMap, setColorMap] = useState<Record<string, string>>({});
 	const [descriptionExpanded, setDescriptionExpanded] = useState(false);
 	const [descriptionCanExpand, setDescriptionCanExpand] = useState(false);
+	const [shippingEstimate, setShippingEstimate] =
+		useState<ShippingEstimateState | null>(null);
 	const descriptionRef = useRef<HTMLDivElement>(null);
 
 	const resolveVariantID = useCallback(
@@ -159,6 +184,55 @@ export default function ProductPage() {
 				setVariantID(0);
 			});
 	}, [color, size, id, product, resolveVariantID]);
+
+	useEffect(() => {
+		if (!product) return;
+
+		const fallbackEstimate = getFallbackShippingEstimate(product, size);
+		const controller = new AbortController();
+		const params = new URLSearchParams({
+			productType: product.product_type,
+			size,
+		});
+
+		fetch(`/api/shipping/estimate?${params.toString()}`, {
+			signal: controller.signal,
+		})
+			.then((response) => {
+				if (!response.ok) {
+					throw new Error("Failed to load shipping estimate");
+				}
+				return response.json() as Promise<{
+					estimate?: string;
+					location?: string;
+					isLocationBased?: boolean;
+				}>;
+			})
+			.then((data) => {
+				setShippingEstimate({
+					estimate: data.estimate || fallbackEstimate,
+					location: data.location || "",
+					isLocationBased: Boolean(data.isLocationBased),
+					productType: product.product_type,
+					size,
+				});
+			})
+			.catch((estimateError) => {
+				if (estimateError instanceof DOMException && estimateError.name === "AbortError") {
+					return;
+				}
+				console.error("Failed to fetch shipping estimate:", estimateError);
+			});
+
+		return () => controller.abort();
+	}, [product, size]);
+
+	const activeShippingEstimate =
+		product &&
+		shippingEstimate?.productType === product.product_type &&
+		shippingEstimate?.size === size
+			? shippingEstimate
+			: null;
 
 	const handleAddToCart = async (images: string[]) => {
 		if (!product) return;
@@ -367,7 +441,8 @@ export default function ProductPage() {
 										: "Select a size"}
 								</div>
 								<div className="mt-1 text-sm font-medium text-[#5f5650]">
-									Estimated shipping time: 3-5 days
+									Estimated shipping time: {activeShippingEstimate?.estimate || getFallbackShippingEstimate(product, size)}
+									{activeShippingEstimate?.isLocationBased && activeShippingEstimate.location ? ` near ${activeShippingEstimate.location}` : ""}
 								</div>
 							</div>
 

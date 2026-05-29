@@ -15,18 +15,18 @@ export default function ShopItem({
 	badgeLabel: string;
 }) {
 	return (
-		<div className="flex w-full justify-center justify-self-center md:w-fit group">
+		<div className="flex h-full w-full justify-center justify-self-center group">
 			<Link
-				className="glass-panel store-button flex w-full max-w-sm flex-col overflow-hidden rounded-3xl p-3 text-left shadow-[0_24px_70px_rgba(20,17,16,0.09)]"
+				className="glass-panel store-button flex h-full w-full max-w-sm flex-col overflow-hidden rounded-3xl p-3 text-left shadow-[0_24px_70px_rgba(20,17,16,0.09)]"
 				href={`/product/${productId}`}
 			>
-				<div className="relative overflow-hidden rounded-[1.35rem] bg-[#f6efe6] sm:rounded-[1.5rem]">
+				<div className="relative aspect-[4/5] overflow-hidden rounded-[1.35rem] bg-[#f6efe6] sm:rounded-[1.5rem]">
 					<Image
 						src={imagePath}
 						alt={displayName}
 						width={2000}
 						height={2000}
-						className="h-auto w-full object-contain transition duration-500 group-hover:scale-[1.03]"
+						className="h-full w-full object-contain transition duration-500 group-hover:scale-[1.03]"
 						unoptimized
 						loading="lazy"
 					/>
@@ -39,11 +39,11 @@ export default function ShopItem({
 						<div className="text-[10px] uppercase tracking-[0.22em] text-[#7a716a] sm:text-[11px] sm:tracking-[0.28em]">
 							Limited selection
 						</div>
-						<div className="display-font text-2xl leading-none text-[#141110] sm:text-3xl">
+						<div className="display-font line-clamp-2 min-h-[3.5rem] text-2xl leading-[1.05] text-[#141110] sm:min-h-[4rem] sm:text-3xl">
 							{displayName}
 						</div>
 					</div>
-					<div className="flex flex-wrap items-center justify-between gap-2 text-sm text-[#6a625d]">
+					<div className="mt-auto flex min-h-10 flex-wrap items-center justify-between gap-2 text-sm text-[#6a625d]">
 						<span>{priceLabel}</span>
 						<span className="font-semibold text-[#d15b43]">View piece</span>
 					</div>

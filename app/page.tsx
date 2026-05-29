@@ -1,6 +1,6 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
+import { Suspense, useEffect, useMemo, useRef, useState } from "react";
 import ShopItem from "./components/ShopItem";
 import TopBar from "./components/TopBar";
 import Filter from "./components/Filter";
@@ -12,7 +12,8 @@ import { PrintifyProduct } from "./utils/PrintifyProduct";
 
 // Create a separate component that uses useSearchParams
 function ProductsGrid() {
-	const [products, setProducts] = useState<PrintifyProduct[]>([]);
+	const [posters, setPosters] = useState<PrintifyProduct[]>([]);
+	const [tshirts, setTshirts] = useState<PrintifyProduct[]>([]);
 	const [isLoading, setIsLoading] = useState(true);
 	const searchParams = useSearchParams();
 	const filterType = searchParams.get("f");
@@ -23,14 +24,14 @@ function ProductsGrid() {
 	useEffect(() => {
 		const fetchInitialProducts = async () => {
 			setIsLoading(true);
-			let posters: PrintifyProduct[] = [];
-			let tshirts: PrintifyProduct[] = [];
+			let fetchedPosters: PrintifyProduct[] = [];
+			let fetchedTshirts: PrintifyProduct[] = [];
 
 			try {
 				const res = await fetch("/api/database/tshirts");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
-				tshirts = data;
+				fetchedTshirts = data;
 			} catch (error) {
 				console.error("Error fetching tshirts:", error);
 			}
@@ -39,68 +40,73 @@ function ProductsGrid() {
 				const res = await fetch("/api/database/posters");
 				const data = await res.json();
 				if (data.error) throw new Error(data.error);
-				posters = data;
+				fetchedPosters = data;
 			} catch (error) {
 				console.error("Error fetching posters:", error);
 			}
 
-			let allProducts: PrintifyProduct[] = [];
-
-			if (filterType === "posters") {
-				allProducts.push(...posters);
-			} else if (filterType === "tshirts") {
-				allProducts.push(...tshirts);
-			} else {
-				allProducts.push(...posters);
-				allProducts.push(...tshirts);
-			}
-
-			if (sortByType === "priceasec") {
-				allProducts.sort((product1, product2) => {
-					const price1 = product1.prices[0]?.price || 0;
-					const price2 = product2.prices[0]?.price || 0;
-					return price1 - price2;
-				});
-			} else if (sortByType === "pricedesc") {
-				allProducts.sort((product1, product2) => {
-					const price1 = product1.prices[0]?.price || 0;
-					const price2 = product2.prices[0]?.price || 0;
-					return price2 - price1;
-				});
-			} else if (sortByType === "alphaasec") {
-				allProducts.sort((product1, product2) => {
-					const name1 = product1.title || "";
-					const name2 = product2.title || "";
-					return name1.localeCompare(name2);
-				});
-			} else if (sortByType === "alphadesc") {
-				allProducts.sort((product1, product2) => {
-					const name1 = product1.title || "";
-					const name2 = product2.title || "";
-					return name2.localeCompare(name1);
-				});
-			} else if (sortByType === "releaseasec") {
-				allProducts.sort((product1, product2) => {
-					const date1 = product1.created_at || "";
-					const date2 = product2.created_at || "";
-					return date2.localeCompare(date1);
-				});
-			} else if (sortByType === "releasedesc") {
-				allProducts.sort((product1, product2) => {
-					const date1 = product1.created_at || "";
-					const date2 = product2.created_at || "";
-					return date1.localeCompare(date2);
-				});
-			} else {
-				allProducts = allProducts.sort(() => Math.random() - 0.5);
-			}
-
-			setProducts(allProducts);
+			setPosters(fetchedPosters);
+			setTshirts(fetchedTshirts);
 			setIsLoading(false);
 		};
 
 		fetchInitialProducts();
-	}, [filterType, sortByType]); // Added sortByType to dependency array
+	}, []);
+
+	const products = useMemo(() => {
+		let allProducts: PrintifyProduct[] = [];
+
+		if (filterType === "posters") {
+			allProducts.push(...posters);
+		} else if (filterType === "tshirts") {
+			allProducts.push(...tshirts);
+		} else {
+			allProducts.push(...posters);
+			allProducts.push(...tshirts);
+		}
+
+		if (sortByType === "priceasec") {
+			allProducts.sort((product1, product2) => {
+				const price1 = product1.prices[0]?.price || 0;
+				const price2 = product2.prices[0]?.price || 0;
+				return price1 - price2;
+			});
+		} else if (sortByType === "pricedesc") {
+			allProducts.sort((product1, product2) => {
+				const price1 = product1.prices[0]?.price || 0;
+				const price2 = product2.prices[0]?.price || 0;
+				return price2 - price1;
+			});
+		} else if (sortByType === "alphaasec") {
+			allProducts.sort((product1, product2) => {
+				const name1 = product1.title || "";
+				const name2 = product2.title || "";
+				return name1.localeCompare(name2);
+			});
+		} else if (sortByType === "alphadesc") {
+			allProducts.sort((product1, product2) => {
+				const name1 = product1.title || "";
+				const name2 = product2.title || "";
+				return name2.localeCompare(name1);
+			});
+		} else if (sortByType === "releaseasec") {
+			allProducts.sort((product1, product2) => {
+				const date1 = product1.created_at || "";
+				const date2 = product2.created_at || "";
+				return date2.localeCompare(date1);
+			});
+		} else if (sortByType === "releasedesc") {
+			allProducts.sort((product1, product2) => {
+				const date1 = product1.created_at || "";
+				const date2 = product2.created_at || "";
+				return date1.localeCompare(date2);
+			});
+		} else {
+			allProducts = allProducts.sort(() => Math.random() - 0.5);
+		}
+
+		return allProducts;
+	}, [filterType, posters, sortByType, tshirts]);
 
 	// Handle scrolling after products are loaded and rendered
 	useEffect(() => {
@@ -123,7 +129,7 @@ function ProductsGrid() {
 	return (
 		<div
 			id="items"
-			className="mx-auto mb-6 grid w-full max-w-6xl grid-cols-1 items-center justify-center gap-5 px-4 sm:gap-8 lg:grid-cols-2 xl:grid-cols-3"
+			className="mx-auto mb-6 grid w-full max-w-6xl grid-cols-1 items-stretch justify-center gap-5 px-4 sm:gap-8 lg:grid-cols-2 xl:grid-cols-3"
 			ref={itemsRef}
 		>
 			{isLoading ? (

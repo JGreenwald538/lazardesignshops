@@ -1,4 +1,4 @@
-import { useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 const FilterList = [
@@ -72,7 +72,33 @@ export default function Filter() {
 	}, [handleClickOutside]);
 
 	const searchParams = useSearchParams();
+	const router = useRouter();
+	const pathname = usePathname();
+	const selectedFilter = searchParams.get("f");
 	const sortByType = searchParams.get("s");
+
+	const handleFilterSelect = useCallback(
+		(filterQuery: string) => {
+			const nextParams = new URLSearchParams(searchParams.toString());
+
+			if (selectedFilter === filterQuery) {
+				nextParams.delete("f");
+			} else {
+				nextParams.set("f", filterQuery);
+			}
+
+			if (!sortByType) {
+				nextParams.delete("s");
+			}
+
+			const queryString = nextParams.toString();
+			router.replace(queryString ? `${pathname}?${queryString}` : pathname, {
+				scroll: false,
+			});
+			closeMenu();
+		},
+		[closeMenu, pathname, router, searchParams, selectedFilter, sortByType],
+	);
 
 	return (
 		<div ref={filterRef} className="relative z-[1000] inline-block w-full sm:w-auto">
@@ -93,15 +119,19 @@ export default function Filter() {
 				>
 					{FilterList.map(
 						(filter: { name: string; query: string }, index: number) => (
-							<a
-								href={`/?f=${filter.query}&s=${sortByType}`}
+							<button
+								type="button"
 								key={index}
-								className={`block px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] text-[#141110] transition-colors hover:bg-[#f4ece3] ${
-									index % 2 === 0 ? "bg-white" : "bg-[#f9f4ee]"
+								className={`block w-full px-4 py-3 text-center text-sm font-semibold uppercase tracking-[0.18em] transition-colors hover:bg-[#f4ece3] ${
+									selectedFilter === filter.query
+										? "bg-[#141110] text-white hover:bg-[#141110]"
+										: `${index % 2 === 0 ? "bg-white" : "bg-[#f9f4ee]"} text-[#141110]`
 								}`}
+								onClick={() => handleFilterSelect(filter.query)}
+								aria-pressed={selectedFilter === filter.query}
 							>
 								{filter.name}
-							</a>
+							</button>
 						),
 					)}
 				</div>
