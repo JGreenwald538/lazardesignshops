@@ -58,24 +58,6 @@ body {
   letter-spacing: 0;
 }
 
-.free-shipping-ticker {
-  animation: free-shipping-ticker 24s linear infinite;
-}
-
-.free-shipping-ticker:hover {
-  animation-play-state: paused;
-}
-
-@keyframes free-shipping-ticker {
-  from {
-    transform: translateX(0);
-  }
-
-  to {
-    transform: translateX(-50%);
-  }
-}
-
 .product-description-preview {
   max-height: calc(1.625rem * 6);
   overflow: hidden;
