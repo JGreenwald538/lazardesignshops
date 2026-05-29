@@ -124,7 +124,8 @@ function createShippingOptions(
 			return {
 				id,
 				label: config.label,
-				amount: Math.max(0, amount - standardDiscount),
+				amount:
+					id === "standard" ? Math.max(0, amount - standardDiscount) : amount,
 				printifyMethod: config.printifyMethod,
 			};
 		})

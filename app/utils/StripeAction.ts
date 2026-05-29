@@ -29,7 +29,10 @@ export async function fetchShippingOptions(shippingAddress: ShippingAddress) {
 
 	return rawOptions.map((option) => ({
 		...option,
-		amount: Math.max(0, option.amount - standardDiscount),
+		amount:
+			option.id === "standard"
+				? Math.max(0, option.amount - standardDiscount)
+				: option.amount,
 	}));
 }
 

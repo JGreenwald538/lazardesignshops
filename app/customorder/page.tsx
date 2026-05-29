@@ -96,10 +96,10 @@ export default function CustomOrderPage() {
 						✶ Made just for you
 					</span>
 					<h1 className="mt-5 text-4xl font-black leading-tight tracking-tight text-[#141110] sm:text-5xl">
-						Let&apos;s make something
-						<span className="relative inline-block text-[#d15b43] sm:ml-2">
+						<span className="font-black">Let&apos;s make something</span>
+						<span className="custom-order-hand relative inline-block text-[#d15b43] sm:ml-3 text-5xl">
 							one&#8209;of&#8209;a&#8209;kind
-							<span className="absolute -bottom-1 left-0 h-1 w-full rounded-full bg-[#d15b43]/30" />
+							<span className="absolute bottom-0 left-0 h-1 w-full rounded-full bg-[#d15b43]/30" />
 						</span>
 					</h1>
 					<p className="mx-auto mt-4 max-w-xl text-sm leading-relaxed text-[#6a625d] sm:text-base">
@@ -112,7 +112,7 @@ export default function CustomOrderPage() {
 				{/* Form */}
 				<form
 					onSubmit={handleSubmit}
-					className="glass-panel space-y-7 rounded-3xl p-5 sm:rounded-[2rem] sm:p-9"
+					className="glass-panel space-y-7 rounded-3xl p-5 sm:rounded-4xl sm:p-9"
 				>
 					{/* Contact */}
 					<div className="space-y-4">

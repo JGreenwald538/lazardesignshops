@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Montserrat } from "next/font/google";
+import { Just_Another_Hand, Montserrat } from "next/font/google";
 import "./globals.css";
 import { Suspense } from "react";
 
@@ -16,7 +16,13 @@ import { Suspense } from "react";
 const montserrat = Montserrat({
 	variable: "--font-montserrat",
 	subsets: ["latin"],
-	weight: ["500"],
+	weight: ["500", "700", "800", "900"],
+});
+
+const justAnotherHand = Just_Another_Hand({
+	variable: "--font-just-another-hand",
+	subsets: ["latin"],
+	weight: "400",
 });
 
 export const metadata: Metadata = {
@@ -59,7 +65,7 @@ export default function RootLayout({
 	return (
 		<html lang="en">
 			<body
-				className={`${montserrat.variable} antialiased bg-[#FCF5EE] text-[#141110]`}
+				className={`${montserrat.variable} ${justAnotherHand.variable} antialiased bg-[#FCF5EE] text-[#141110]`}
 			>
 				<Suspense>{children}</Suspense>
 			</body>
